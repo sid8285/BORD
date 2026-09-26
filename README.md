@@ -24,3 +24,5 @@ Checkpoint 1: planning only. There is no code yet.
 ## Planned stack
 
 Python FastAPI backend, React frontend, a frontier multimodal LLM API, Stripe (test mode only; no real money moves).
+
+## Test to verify repo setup + C1 completion
