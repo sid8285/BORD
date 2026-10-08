@@ -37,3 +37,10 @@ python -m bord.build_manifest --data ../data
 ```
 
 It prints the honest and adversarial counts per category. It also warns about pairs whose EXIF capture times are missing or out of order.
+
+**Before committing photos, strip the GPS location.** Phone photos usually record where they were taken, and the repository is public. `build_manifest` warns when it finds GPS data. [exiftool](https://exiftool.org) (`brew install exiftool`) removes it without re-encoding the image, and it keeps the capture time that the timestamp check uses:
+
+```bash
+exiftool -r -gps:all= -overwrite_original data/   # -r reaches the photos in data/pairs/<id>/
+exiftool -r -gps:all data/                          # check: should list file names but no GPS tags
+```

@@ -43,6 +43,7 @@ from .dataset import LABELS, MANIFEST_COLUMNS, TASK_TYPES, load_manifest
 
 IMAGE_EXTS = (".jpg", ".jpeg", ".png")
 EXIF_IFD = 0x8769
+GPS_IFD = 0x8825
 DATETIME_ORIGINAL = 36867
 DATETIME = 306
 HAND_MADE = {"staged_partial": "phone", "ai_edited": "generated"}
@@ -62,6 +63,15 @@ def capture_time(path: Path) -> str:
         return datetime.strptime(str(raw).strip(), "%Y:%m:%d %H:%M:%S").isoformat()
     except ValueError:
         return ""
+
+
+def has_gps(path: Path) -> bool:
+    """True if the photo carries a GPS location. Phone photos usually do, and the repo is public."""
+    try:
+        with Image.open(path) as img:
+            return bool(img.getexif().get_ifd(GPS_IFD))
+    except OSError:
+        return False
 
 
 def find_image(folder: Path, stem: str) -> Path | None:
@@ -171,6 +181,13 @@ def main(argv: list[str] | None = None) -> int:
     for r in attacks:
         counts[r["adversarial_category"]] = counts.get(r["adversarial_category"], 0) + 1
     print(f"wrote {out}: {len(honest)} honest, {len(attacks)} adversarial {counts}")
+    image_paths = sorted({args.data / r[k] for r in honest + attacks for k in ("before_path", "after_path")})
+    located = [p for p in image_paths if has_gps(p)]
+    if located:
+        warnings.append(
+            f"{len(located)} photo(s) contain a GPS location, e.g. {located[0].relative_to(args.data)}. "
+            f"Strip it before committing (the repo is public): exiftool -r -gps:all= -overwrite_original {args.data}"
+        )
     for w in warnings:
         print(f"warning: {w}", file=sys.stderr)
     return 0

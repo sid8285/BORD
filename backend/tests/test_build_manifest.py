@@ -45,3 +45,15 @@ def test_builds_all_attack_types(tmp_path):
     assert by_id["p03-ai_edited"].capture_source == "generated"
     assert by_id["p01"].before_captured_at == "2026-10-01T09:00:00"
     assert all(s.expected_verdict == "not_completed" for s in subs if s.is_adversarial)
+
+
+def test_warns_about_gps_location(tmp_path, capsys):
+    (tmp_path / "pairs.csv").write_text("pair_id,task_type,task_description,label,scene_id\n"
+                                        "p01,single_scene,Clean my desk,completed,desk\n")
+    _photo(tmp_path / "pairs" / "p01" / "before.jpg", "2026:10:01 09:00:00")
+    img = Image.new("RGB", (32, 24), "white")
+    exif = Image.Exif()
+    exif.get_ifd(0x8825)[2] = (33.0, 46.0, 30.0)  # GPSLatitude
+    img.save(tmp_path / "pairs" / "p01" / "after.jpg", exif=exif)
+    assert main(["--data", str(tmp_path)]) == 0
+    assert "GPS location" in capsys.readouterr().err
