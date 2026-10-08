@@ -1,0 +1,5 @@
+pair_id,set,task_type,task_description,before_path,after_path,label,adversarial_category,base_pair_id,capture_source,before_captured_at,after_captured_at
+p001,honest,single_scene,Clean my desk,pairs/p001/before.jpg,pairs/p001/after.jpg,completed,,,phone,2026-10-02T09:15:00-04:00,2026-10-02T10:05:00-04:00
+p002,honest,single_scene,Make my bed,pairs/p002/before.jpg,pairs/p002/after.jpg,not_completed,,,phone,2026-10-03T08:00:00-04:00,2026-10-03T08:20:00-04:00
+p001-reused,adversarial,single_scene,Clean my desk,pairs/p001/before.jpg,adversarial/p001-reused.jpg,not_completed,reused,p001,phone,,
+p001-web,adversarial,single_scene,Clean my desk,pairs/p001/before.jpg,adversarial/p001-web.jpg,not_completed,web_sourced,p001,web,,

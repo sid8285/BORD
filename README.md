@@ -26,3 +26,20 @@ Checkpoint 1: planning only. There is no code yet.
 Python FastAPI backend, React frontend, a frontier multimodal LLM API, Stripe (test mode only; no real money moves).
 
 ## Test to verify repo setup + C1 completion
+
+## Checkpoint 2: baseline verifier and evaluation harness
+
+- `backend/bord/dataset.py`: manifest loader for the self-collected and adversarial sets (schema in `data/manifest.example.csv`, following `docs/dataset_spec.md`). Adversarial rows reference the honest pair they were built from; their correct verdict is always `not_completed`.
+- `backend/bord/verifier.py`: LLM-only baseline. One call with the task text, the before photo and the after photo; returns verdict, confidence, latency, tokens and cost. Images are downscaled and re-encoded (EXIF dropped). Model via `BORD_MODEL`, effort via `BORD_EFFORT`, timeout via `BORD_TIMEOUT_S` (default 10 s).
+- `backend/bord/evaluate.py`: runs the verifier over a manifest and writes `results/<run_id>/predictions.jsonl` and `summary.json` (honest accuracy, false-reject rate, fooled rate per adversarial category, latency p50/p95, cost per call, and a holding/broken check for Assumptions 1 and 2).
+
+```bash
+cd backend
+pip install -r requirements.txt
+pytest                       # offline tests, no API key needed
+export ANTHROPIC_API_KEY=...
+python -m bord.evaluate --manifest ../data/manifest.csv --out ../results --limit 2   # smoke test
+python -m bord.evaluate --manifest ../data/manifest.csv --out ../results
+```
+
+Commit the `results/<run_id>/` folder; it is the evidence for Assumptions 1 and 2.
