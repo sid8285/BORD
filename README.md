@@ -13,19 +13,20 @@ CS 4220/6235 Real Time Embedded Systems, Fall 2026, Group 34 (solo).
 
 ## Status
 
-Checkpoint 1: planning only. There is no code yet.
+Checkpoint 1: planning only (submitted at `5f4de2bf`).
+Checkpoint 2: LLM-only baseline verifier, evaluation harness, real-time deadline handling and the first evaluation runs.
 
 ## Docs
 
 - [Dataset spec](docs/dataset_spec.md)
 - [Related work](docs/related_work.md)
 - [Technology assumptions and platforms](docs/assumptions.md)
+- [Real-time budget](docs/realtime_budget.md)
+- [Collecting pairs](docs/collecting_pairs.md)
 
 ## Planned stack
 
 Python FastAPI backend, React frontend, a frontier multimodal LLM API, Stripe (test mode only; no real money moves).
-
-## Test to verify repo setup + C1 completion
 
 ## Checkpoint 2: baseline verifier and evaluation harness
 
