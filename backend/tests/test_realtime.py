@@ -119,3 +119,16 @@ def test_summary_realtime_and_decisions():
     assert s["decisions"]["adversarial"] == {RELEASE: 12, FORFEIT: 17, HOLD: 1}
     assert set(s["stage_latency_s"]) == {"preprocess_s", "llm_s"}
     assert s["assumptions"]["2"]["p95_llm_latency_s"] == pytest.approx(2.9)
+
+
+def test_compare_runs_table(tmp_path, capsys):
+    import json
+    from bord.compare_runs import main
+    s = summarize([_rec("honest", "completed", "completed", RELEASE, 2.0)])
+    s["run"] = {"model": "claude-haiku-5-5"}
+    run = tmp_path / "r1"
+    run.mkdir()
+    (run / "summary.json").write_text(json.dumps(s))
+    main([str(run)])
+    out = capsys.readouterr().out.splitlines()
+    assert out[2].startswith("| claude-haiku-5-5 | `r1` | 1/0 | 100% [")
