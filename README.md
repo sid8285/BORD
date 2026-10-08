@@ -48,6 +48,7 @@ python -m bord.evaluate --manifest ../data/manifest.csv --out ../results --limit
 python -m bord.evaluate --manifest ../data/manifest.csv --out ../results                # Opus 5.5 baseline
 python -m bord.evaluate --manifest ../data/manifest.csv --out ../results --model claude-sonnet-5-5
 python -m bord.evaluate --manifest ../data/manifest.csv --out ../results --model claude-haiku-5-5
+python -m bord.compare_runs ../results/*/ > ../docs/results_cp2.md                     # comparison table for the report
 ```
 
-Commit each `results/<run_id>/` folder together with `data/manifest.csv`. They are the evidence for Assumptions 1 and 2 and the real-time budget.
+Commit each `results/<run_id>/` folder, `docs/results_cp2.md` and `data/manifest.csv`. They are the evidence for Assumptions 1 and 2 and the real-time budget.
