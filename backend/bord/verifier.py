@@ -92,8 +92,11 @@ def call_cost_usd(model: str, input_tokens: int, output_tokens: int) -> float:
     return (input_tokens * in_price + output_tokens * out_price) / 1_000_000
 
 
-def encode_image(path: Path, max_side: int = MAX_IMAGE_SIDE) -> dict:
-    """Load, orient, downscale and JPEG-encode an image as an API content block."""
+def encode_jpeg_b64(path: Path, max_side: int = MAX_IMAGE_SIDE) -> str:
+    """Load, orient, downscale and JPEG-encode an image; returns base64 text.
+
+    Re-encoding drops EXIF, so every provider judges pixels only.
+    """
     with Image.open(path) as img:
         # JPEG only: decode at a reduced DCT scale that is still >= max_side.
         # A 12 MP phone photo otherwise takes about 1 s to decode, twice the
@@ -103,10 +106,15 @@ def encode_image(path: Path, max_side: int = MAX_IMAGE_SIDE) -> dict:
         img.thumbnail((max_side, max_side))
         buf = io.BytesIO()
         img.save(buf, format="JPEG", quality=90)
-    data = base64.standard_b64encode(buf.getvalue()).decode("ascii")
+    return base64.standard_b64encode(buf.getvalue()).decode("ascii")
+
+
+def encode_image(path: Path, max_side: int = MAX_IMAGE_SIDE) -> dict:
+    """An image as an Anthropic API content block."""
     return {
         "type": "image",
-        "source": {"type": "base64", "media_type": "image/jpeg", "data": data},
+        "source": {"type": "base64", "media_type": "image/jpeg",
+                   "data": encode_jpeg_b64(path, max_side)},
     }
 
 

@@ -1,3 +1,4 @@
 anthropic>=1.12,<2
+openai>=3,<4
 pillow>=10,<13
 pytest>=8,<10

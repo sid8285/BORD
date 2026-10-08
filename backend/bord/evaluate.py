@@ -23,6 +23,9 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import platform
+import re
+import subprocess
 import sys
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -30,6 +33,7 @@ from pathlib import Path
 from typing import Iterable, Protocol
 
 from .dataset import ADVERSARIAL_CATEGORIES, Submission, load_manifest
+from .qwen_verifier import PROVIDERS, QwenVerifier
 from .realtime import HOLD, RELEASE, Budget, RealtimeVerifier, Thresholds
 from .verifier import (
     DEFAULT_EFFORT,
@@ -270,13 +274,49 @@ def run(
     return summary
 
 
+def host_info() -> dict:
+    """The machine the run used. Local-model latency is a property of this hardware."""
+    info = {"platform": platform.platform(), "machine": platform.machine(),
+            "python": platform.python_version()}
+    if sys.platform == "darwin":
+        for key, name in (("machdep.cpu.brand_string", "cpu"), ("hw.memsize", "memory_bytes")):
+            try:
+                info[name] = subprocess.run(["sysctl", "-n", key], capture_output=True,
+                                            text=True, timeout=2).stdout.strip()
+            except (OSError, subprocess.SubprocessError):
+                pass
+    return info
+
+
+def build_verifier(args) -> tuple[object, dict]:
+    """The verdict model for --provider, plus what the run metadata should record."""
+    if args.provider == "anthropic":
+        model = args.model or DEFAULT_MODEL
+        v = LLMOnlyVerifier(model=model, effort=args.effort, timeout_s=args.llm_timeout)
+        return v, {"provider": "anthropic", "model": model, "effort": args.effort}
+    v = QwenVerifier(provider=args.provider, model=args.model, base_url=args.base_url,
+                     timeout_s=args.llm_timeout, json_mode=args.json_mode)
+    return v, {"provider": args.provider, "model": v.model, "json_mode": v.json_mode,
+               "base_url": args.base_url or PROVIDERS[args.provider].base_url,
+               "price_per_mtok": list(v.prices)}
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Evaluate the BORD LLM-only baseline verifier.")
     parser.add_argument("--manifest", required=True, type=Path)
     parser.add_argument("--out", default=Path("results"), type=Path)
-    parser.add_argument("--model", default=DEFAULT_MODEL)
+    parser.add_argument("--provider", default="ollama", choices=["anthropic", *PROVIDERS],
+                        help="where the verdict model runs (default: Qwen VL on local Ollama)")
+    parser.add_argument("--model", help="model id; default depends on --provider")
+    parser.add_argument("--base-url", help="override the provider's API base URL")
+    parser.add_argument("--json-mode", choices=["schema", "object", "none"],
+                        help="Qwen providers: how to request JSON output")
     parser.add_argument("--effort", default=DEFAULT_EFFORT,
-                        choices=["low", "medium", "high", "xhigh", "max"])
+                        choices=["low", "medium", "high", "xhigh", "max"],
+                        help="anthropic provider only")
+    parser.add_argument("--warmup", action=argparse.BooleanOptionalAction, default=None,
+                        help="one untimed call before the run so model loading is not measured "
+                             "(default: on for local providers)")
     parser.add_argument("--llm-timeout", default=Budget().llm_s, type=float,
                         help="first-attempt LLM request timeout (stage budget), seconds")
     parser.add_argument("--deadline", default=Budget().server_deadline_s, type=float,
@@ -290,16 +330,28 @@ def main(argv: list[str] | None = None) -> int:
     if args.limit:
         submissions = submissions[: args.limit]
 
+    model_verifier, model_meta = build_verifier(args)
+    warmup = args.warmup if args.warmup is not None else args.provider in ("ollama", "openai-compatible")
+    warmup_meta = None
+    if warmup and submissions:
+        # Untimed: the first request to a local server includes loading the weights,
+        # which is a cold-start cost, not steady-state verdict latency.
+        w = model_verifier.verify(submissions[0])
+        warmup_meta = {"latency_s": w.latency_s, "error": w.error}
+        print(f"warm-up: {w.latency_s:.2f}s ({w.error or 'ok'})", file=sys.stderr)
+
     started = datetime.now(timezone.utc)
-    run_id = started.strftime("%Y%m%dT%H%M%SZ") + f"_{args.model}"
+    safe_model = re.sub(r"[^A-Za-z0-9._-]+", "-", model_meta["model"])
+    run_id = started.strftime("%Y%m%dT%H%M%SZ") + f"_{safe_model}"
     out_dir = args.out / run_id
     meta = {
         "run_id": run_id,
         "started_at": started.isoformat(),
         "manifest": str(args.manifest),
         "verifier": "llm_only_baseline",
-        "model": args.model,
-        "effort": args.effort,
+        **model_meta,
+        "warmup": warmup_meta,
+        "host": host_info(),
         "llm_timeout_s": args.llm_timeout,
         "server_deadline_s": args.deadline,
         "release_min_conf": args.release_min_conf,
@@ -307,7 +359,7 @@ def main(argv: list[str] | None = None) -> int:
     }
     budget = Budget(server_deadline_s=args.deadline, llm_s=args.llm_timeout)
     verifier = RealtimeVerifier(
-        LLMOnlyVerifier(model=args.model, effort=args.effort, timeout_s=args.llm_timeout),
+        model_verifier,
         budget=budget,
         thresholds=Thresholds(args.release_min_conf, args.forfeit_min_conf),
     )

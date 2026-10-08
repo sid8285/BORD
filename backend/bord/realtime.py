@@ -21,7 +21,7 @@ import time
 from dataclasses import dataclass
 
 from .dataset import Submission
-from .verifier import LLMOnlyVerifier, VerifierResult
+from .verifier import VerifierResult
 
 # Errors worth one retry. Refusals and unparseable output are deterministic
 # enough that a retry would only burn the budget.
@@ -73,7 +73,7 @@ class RealtimeVerifier:
 
     def __init__(
         self,
-        verifier: LLMOnlyVerifier,
+        verifier,  # LLMOnlyVerifier or QwenVerifier: anything with prepare() and call()
         budget: Budget = Budget(),
         thresholds: Thresholds = Thresholds(),
         clock=time.perf_counter,
