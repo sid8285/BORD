@@ -117,7 +117,9 @@ def test_run_and_summary(tmp_path):
     assert summary["errors"] == {"timeout": 1}
     assert summary["cost_usd"]["mean_per_call"] == pytest.approx(0.01)
     assert summary["latency_s"]["p95"] == 10.0
-    assert summary["assumptions"]["1"]["status"] == "holding"
+    # n=2 is far too small for the 95% interval to clear the thresholds.
+    assert summary["assumptions"]["1"]["status"] == "holding (not significant)"
+    assert summary["honest_accuracy_ci95"][0] < 0.9
     assert summary["assumptions"]["2"]["status"] == "broken"  # p95 10 s > 8 s
     assert json.loads((out / "summary.json").read_text())["run"]["run_id"] == "test"
 
