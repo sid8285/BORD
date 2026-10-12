@@ -46,4 +46,6 @@ The first request after Ollama starts also loads the weights, which takes second
 ## Measured so far
 
 - Preprocessing a 12 MP worst-case JPEG (random noise, 4032×3024) took about 0.41 s per photo after a JPEG reduced-scale decode was added, down from about 1.07 s. That is roughly 0.8 s for two photos, over the 0.5 s stage budget. Real photos compress better and decode faster, and the first evaluation run will show whether the budget holds. If it doesn't, the fix is to downscale in the browser before upload (CP4), which also shortens stage 2.
-- The LLM stage numbers come from the first evaluation run.
+- On the real CP2 photos (iPhone 16 Pro, up to 5712×4284), preprocessing both photos of a submission took 0.20 s at p95 (`stage_latency_s.preprocess_s`, run `20261012T012236Z`), within the 0.5 s stage budget.
+- The LLM stage (Qwen3-VL 8B through Ollama on an Apple M4 Pro, 48 GB) took 9.60 s at p50 and 10.42 s at p95 with the timeout relaxed to 60 s (run `20261012T012236Z`). That is over the 6.5 s stage budget and the 8 s Assumption 2 threshold (Broken).
+- Under the real budget (run `20261012T011713Z`), every one of the 46 submissions hit the 6.5 s timeout and ended as a hold, with a server p95 of 6.70 s. No deadline was missed and no money would have moved.
