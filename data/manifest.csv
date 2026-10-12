@@ -1,0 +1,47 @@
+pair_id,set,task_type,task_description,before_path,after_path,label,adversarial_category,base_pair_id,capture_source,before_captured_at,after_captured_at
+p001,honest,single_scene,Put my headphones on the charger,pairs/p001/before.jpeg,pairs/p001/after.jpeg,completed,,,phone,2026-10-11T18:30:00,2026-10-11T18:30:08
+p002,honest,single_scene,Throw the tissue away,pairs/p002/before.jpeg,pairs/p002/after.jpeg,completed,,,phone,2026-10-11T20:11:24,2026-10-11T20:11:28
+p003,honest,single_scene,Get rid of the Coke can,pairs/p003/before.jpeg,pairs/p003/after.jpeg,completed,,,phone,2026-10-11T20:11:44,2026-10-11T20:11:50
+p004,honest,single_scene,Turn off the lamp,pairs/p004/before.jpeg,pairs/p004/after.jpeg,completed,,,phone,2026-10-11T20:13:27,2026-10-11T20:13:32
+p005,honest,single_scene,Put the deodorant in the basket,pairs/p005/before.jpeg,pairs/p005/after.jpeg,completed,,,phone,2026-10-11T20:14:14,2026-10-11T20:14:19
+p006,honest,single_scene,Take the stickers off the fridge,pairs/p006/before.jpeg,pairs/p006/after.jpeg,completed,,,phone,2026-10-11T20:15:02,2026-10-11T20:15:19
+p007,honest,single_scene,Get rid of the red light on the Alexa,pairs/p007/before.jpeg,pairs/p007/after.jpeg,completed,,,phone,2026-10-11T20:17:59,2026-10-11T20:18:04
+p008,honest,single_scene,Throw away the receipt,pairs/p008/before.jpeg,pairs/p008/after.jpeg,completed,,,phone,2026-10-11T20:19:51,2026-10-11T20:19:56
+p009,honest,single_scene,Take down the hats,pairs/p009/before.jpeg,pairs/p009/after.jpeg,completed,,,phone,2026-10-11T20:20:13,2026-10-11T20:20:22
+p010,honest,single_scene,Turn off the monitor,pairs/p010/before.jpeg,pairs/p010/after.jpeg,completed,,,phone,2026-10-11T20:20:46,2026-10-11T20:20:53
+p011,honest,single_scene,Organize the money,pairs/p011/before.jpeg,pairs/p011/after.jpeg,completed,,,phone,2026-10-11T20:21:26,2026-10-11T20:21:37
+p012,honest,single_scene,Put the keychain in front of the keyboard,pairs/p012/before.jpeg,pairs/p012/after.jpeg,completed,,,phone,2026-10-11T20:22:09,2026-10-11T20:22:15
+p013,honest,single_scene,Move the sticker,pairs/p013/before.jpeg,pairs/p013/after.jpeg,not_completed,,,phone,2026-10-11T20:23:01,2026-10-11T20:23:06
+p014,honest,single_scene,Close the laptop,pairs/p014/before.jpeg,pairs/p014/after.jpeg,not_completed,,,phone,2026-10-11T20:23:19,2026-10-11T20:23:23
+p015,honest,single_scene,Throw away the Coke can,pairs/p015/before.jpeg,pairs/p015/after.jpeg,not_completed,,,phone,2026-10-11T20:23:42,2026-10-11T20:23:48
+p002-reused-p001,adversarial,single_scene,Throw the tissue away,pairs/p002/before.jpeg,pairs/p001/after.jpeg,not_completed,reused,p002,phone,,
+p003-reused-p002,adversarial,single_scene,Get rid of the Coke can,pairs/p003/before.jpeg,pairs/p002/after.jpeg,not_completed,reused,p003,phone,,
+p004-reused-p003,adversarial,single_scene,Turn off the lamp,pairs/p004/before.jpeg,pairs/p003/after.jpeg,not_completed,reused,p004,phone,,
+p007-reused-p004,adversarial,single_scene,Get rid of the red light on the Alexa,pairs/p007/before.jpeg,pairs/p004/after.jpeg,not_completed,reused,p007,phone,,
+p008-reused-p007,adversarial,single_scene,Throw away the receipt,pairs/p008/before.jpeg,pairs/p007/after.jpeg,not_completed,reused,p008,phone,,
+p010-reused-p008,adversarial,single_scene,Turn off the monitor,pairs/p010/before.jpeg,pairs/p008/after.jpeg,not_completed,reused,p010,phone,,
+p011-reused-p010,adversarial,single_scene,Organize the money,pairs/p011/before.jpeg,pairs/p010/after.jpeg,not_completed,reused,p011,phone,,
+p012-reused-p011,adversarial,single_scene,Put the keychain in front of the keyboard,pairs/p012/before.jpeg,pairs/p011/after.jpeg,not_completed,reused,p012,phone,,
+p013-reused-p006,adversarial,single_scene,Move the sticker,pairs/p013/before.jpeg,pairs/p006/after.jpeg,not_completed,reused,p013,phone,,
+p014-reused-p012,adversarial,single_scene,Close the laptop,pairs/p014/before.jpeg,pairs/p012/after.jpeg,not_completed,reused,p014,phone,,
+p015-reused-p012,adversarial,single_scene,Throw away the Coke can,pairs/p015/before.jpeg,pairs/p012/after.jpeg,not_completed,reused,p015,phone,,
+p001-wrong_scene,adversarial,single_scene,Put my headphones on the charger,pairs/p001/before.jpeg,pairs/p005/after.jpeg,not_completed,wrong_scene,p001,phone,,
+p002-wrong_scene,adversarial,single_scene,Throw the tissue away,pairs/p002/before.jpeg,pairs/p005/after.jpeg,not_completed,wrong_scene,p002,phone,,
+p003-wrong_scene,adversarial,single_scene,Get rid of the Coke can,pairs/p003/before.jpeg,pairs/p005/after.jpeg,not_completed,wrong_scene,p003,phone,,
+p004-wrong_scene,adversarial,single_scene,Turn off the lamp,pairs/p004/before.jpeg,pairs/p005/after.jpeg,not_completed,wrong_scene,p004,phone,,
+p005-wrong_scene,adversarial,single_scene,Put the deodorant in the basket,pairs/p005/before.jpeg,pairs/p006/after.jpeg,not_completed,wrong_scene,p005,phone,,
+p006-wrong_scene,adversarial,single_scene,Take the stickers off the fridge,pairs/p006/before.jpeg,pairs/p007/after.jpeg,not_completed,wrong_scene,p006,phone,,
+p007-wrong_scene,adversarial,single_scene,Get rid of the red light on the Alexa,pairs/p007/before.jpeg,pairs/p009/after.jpeg,not_completed,wrong_scene,p007,phone,,
+p008-wrong_scene,adversarial,single_scene,Throw away the receipt,pairs/p008/before.jpeg,pairs/p009/after.jpeg,not_completed,wrong_scene,p008,phone,,
+p009-wrong_scene,adversarial,single_scene,Take down the hats,pairs/p009/before.jpeg,pairs/p010/after.jpeg,not_completed,wrong_scene,p009,phone,,
+p010-wrong_scene,adversarial,single_scene,Turn off the monitor,pairs/p010/before.jpeg,pairs/p005/after.jpeg,not_completed,wrong_scene,p010,phone,,
+p011-wrong_scene,adversarial,single_scene,Organize the money,pairs/p011/before.jpeg,pairs/p005/after.jpeg,not_completed,wrong_scene,p011,phone,,
+p012-wrong_scene,adversarial,single_scene,Put the keychain in front of the keyboard,pairs/p012/before.jpeg,pairs/p005/after.jpeg,not_completed,wrong_scene,p012,phone,,
+p013-wrong_scene,adversarial,single_scene,Move the sticker,pairs/p013/before.jpeg,pairs/p001/after.jpeg,not_completed,wrong_scene,p013,phone,,
+p014-wrong_scene,adversarial,single_scene,Close the laptop,pairs/p014/before.jpeg,pairs/p005/after.jpeg,not_completed,wrong_scene,p014,phone,,
+p015-wrong_scene,adversarial,single_scene,Throw away the Coke can,pairs/p015/before.jpeg,pairs/p005/after.jpeg,not_completed,wrong_scene,p015,phone,,
+p001-ai_edited,adversarial,single_scene,Put my headphones on the charger,pairs/p001/before.jpeg,adversarial/p001-ai_edited.jpeg,not_completed,ai_edited,p001,generated,,
+p003-ai_edited,adversarial,single_scene,Get rid of the Coke can,pairs/p003/before.jpeg,adversarial/p003-ai_edited.jpeg,not_completed,ai_edited,p003,generated,,
+p005-ai_edited,adversarial,single_scene,Put the deodorant in the basket,pairs/p005/before.jpeg,adversarial/p005-ai_edited.jpeg,not_completed,ai_edited,p005,generated,,
+p011-ai_edited,adversarial,single_scene,Organize the money,pairs/p011/before.jpeg,adversarial/p011-ai_edited.jpeg,not_completed,ai_edited,p011,generated,,
+p014-ai_edited,adversarial,single_scene,Close the laptop,pairs/p014/before.jpeg,adversarial/p014-ai_edited.jpeg,not_completed,ai_edited,p014,generated,,

@@ -1,0 +1,165 @@
+{
+  "run": {
+    "run_id": "20261012T011713Z_qwen3-vl-8b-instruct",
+    "started_at": "2026-10-12T01:17:13.840528+00:00",
+    "manifest": "../data/manifest.csv",
+    "verifier": "llm_only_baseline",
+    "provider": "ollama",
+    "model": "qwen3-vl:8b-instruct",
+    "json_mode": "schema",
+    "base_url": "http://localhost:11434/v1",
+    "price_per_mtok": [
+      0.0,
+      0.0
+    ],
+    "warmup": {
+      "latency_s": 6.531325167044997,
+      "error": "timeout"
+    },
+    "host": {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "python": "3.12.12",
+      "cpu": "Apple M4 Pro",
+      "memory_bytes": "51539607552"
+    },
+    "llm_timeout_s": 6.5,
+    "server_deadline_s": 8.0,
+    "release_min_conf": 0.0,
+    "forfeit_min_conf": 0.0
+  },
+  "n_submissions": 46,
+  "n_answered": 0,
+  "n_honest": 0,
+  "n_adversarial": 0,
+  "errors": {
+    "timeout": 46
+  },
+  "honest_accuracy": null,
+  "honest_accuracy_ci95": null,
+  "false_reject_rate": null,
+  "false_accept_rate_honest": null,
+  "fooled_rate": null,
+  "fooled_rate_ci95": null,
+  "fooled_by_category": {
+    "reused": {
+      "n": 0,
+      "fooled": 0,
+      "fooled_rate": null,
+      "ci95": null
+    },
+    "web_sourced": {
+      "n": 0,
+      "fooled": 0,
+      "fooled_rate": null,
+      "ci95": null
+    },
+    "ai_edited": {
+      "n": 0,
+      "fooled": 0,
+      "fooled_rate": null,
+      "ci95": null
+    },
+    "wrong_scene": {
+      "n": 0,
+      "fooled": 0,
+      "fooled_rate": null,
+      "ci95": null
+    },
+    "staged_partial": {
+      "n": 0,
+      "fooled": 0,
+      "fooled_rate": null,
+      "ci95": null
+    }
+  },
+  "latency_s": {
+    "n": 46,
+    "p50": 6.679217957891524,
+    "p95": 6.70187154202722,
+    "max": 6.71701049990952
+  },
+  "stage_latency_s": {
+    "decision_s": {
+      "n": 46,
+      "p50": 3.209104761481285e-06,
+      "p95": 3.833090886473656e-06,
+      "max": 1.3415934517979622e-05
+    },
+    "llm_s": {
+      "n": 46,
+      "p50": 6.505164082860574,
+      "p95": 6.507012333953753,
+      "max": 6.519185041077435
+    },
+    "preprocess_s": {
+      "n": 46,
+      "p50": 0.17401066701859236,
+      "p95": 0.19441533414646983,
+      "max": 0.19774283282458782
+    }
+  },
+  "realtime": {
+    "server_deadline_s": 8.0,
+    "deadline_misses": 0,
+    "deadline_miss_rate": 0.0,
+    "retried": 0,
+    "holds": 46,
+    "hold_rate": 1.0,
+    "e2e_p95_s": 6.70187154202722,
+    "status": "holding"
+  },
+  "decisions": {
+    "honest": {
+      "hold": 15
+    },
+    "adversarial": {
+      "hold": 31
+    }
+  },
+  "adversarial_released": {
+    "k": 0,
+    "n": 31,
+    "rate": 0.0,
+    "ci95": [
+      0.0,
+      0.11025900073475385
+    ]
+  },
+  "cost_usd": {
+    "mean_per_call": null,
+    "total": 0.0
+  },
+  "assumptions": {
+    "1": {
+      "status": "untested",
+      "honest_accuracy": {
+        "k": 0,
+        "n": 0,
+        "rate": null,
+        "ci95": null,
+        "threshold": 0.9,
+        "status": "untested"
+      },
+      "fooled_rate": {
+        "k": 0,
+        "n": 0,
+        "rate": null,
+        "ci95": null,
+        "threshold": 0.3,
+        "status": "untested"
+      }
+    },
+    "2": {
+      "status": "untested",
+      "mean_cost_usd": null,
+      "cost_status": "untested",
+      "p95_llm_latency_s": 6.507012333953753,
+      "latency_status": "holding",
+      "thresholds": {
+        "max_cost_usd": 0.02,
+        "max_p95_latency_s": 8.0
+      }
+    }
+  }
+}
