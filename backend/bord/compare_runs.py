@@ -23,6 +23,14 @@ def _s(x, fmt="{:.2f}") -> str:
     return "n/a" if x is None else fmt.format(x)
 
 
+def _llm_p95(a2: dict, stages: dict) -> str:
+    if a2.get("p95_llm_latency_at_least_s") is not None:  # timeouts: only a lower bound is known
+        return f">= {a2['p95_llm_latency_at_least_s']:.2f}"
+    if "p95_llm_latency_s" in a2:
+        return _s(a2["p95_llm_latency_s"])
+    return _s(stages.get("llm_s", {}).get("p95"))
+
+
 def row(summary: dict, run_dir: Path) -> str:
     a = summary["assumptions"]
     rt = summary.get("realtime", {})
@@ -35,7 +43,7 @@ def row(summary: dict, run_dir: Path) -> str:
         _pct(summary["honest_accuracy"], summary.get("honest_accuracy_ci95")),
         _pct(summary["fooled_rate"], summary.get("fooled_rate_ci95")),
         _pct(released.get("rate"), released.get("ci95")),
-        _s(stages.get("llm_s", {}).get("p95")),
+        _llm_p95(a["2"], stages),
         _s(summary["latency_s"].get("p95")),
         f"{rt.get('deadline_misses', 'n/a')}",
         _s(summary["cost_usd"]["mean_per_call"], "${:.4f}"),

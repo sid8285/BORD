@@ -121,6 +121,32 @@ def test_summary_realtime_and_decisions():
     assert s["assumptions"]["2"]["p95_llm_latency_s"] == pytest.approx(2.9)
 
 
+def test_timeouts_do_not_pass_the_latency_check(tmp_path, capsys):
+    # Every call hit a 6.5 s timeout: the capped 6.4 s must not read as "under 8 s".
+    records = [_rec("honest", "completed", None, HOLD, 6.5) for _ in range(10)]
+    a2 = summarize(records)["assumptions"]["2"]
+    assert a2["llm_timeouts"] == 10
+    assert a2["p95_llm_latency_s"] is None
+    assert a2["p95_llm_latency_at_least_s"] == pytest.approx(6.4)
+    assert a2["latency_status"] == "untested"  # 6.4 s timeout < 8 s threshold: can't tell
+    # A timeout at or past the threshold is enough to call it broken.
+    slow = [_rec("honest", "completed", None, HOLD, 9.0) for _ in range(10)]
+    assert summarize(slow)["assumptions"]["2"]["latency_status"] == "broken"
+    # One timeout in 40 calls stays outside the p95.
+    mixed = [_rec("honest", "completed", "completed", RELEASE, 2.0) for _ in range(39)] + records[:1]
+    a2 = summarize(mixed)["assumptions"]["2"]
+    assert a2["p95_llm_latency_s"] == pytest.approx(1.9) and a2["latency_status"] == "holding"
+
+    import json
+    from bord.compare_runs import main
+    s = summarize(records)
+    s["run"] = {"model": "qwen3-vl:8b-instruct"}
+    (tmp_path / "r").mkdir()
+    (tmp_path / "r" / "summary.json").write_text(json.dumps(s))
+    main([str(tmp_path / "r")])
+    assert "| >= 6.40 |" in capsys.readouterr().out
+
+
 def test_compare_runs_table(tmp_path, capsys):
     import json
     from bord.compare_runs import main

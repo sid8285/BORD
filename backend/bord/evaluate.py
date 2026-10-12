@@ -151,7 +151,6 @@ def summarize(records: list[dict], server_deadline_s: float = RT_SERVER_DEADLINE
             errors[r["error"].split(":")[0]] += 1
 
     latencies = [r["latency_s"] for r in records]
-    llm_latencies = [r.get("stages", {}).get("llm_s", r["latency_s"]) for r in records]
     stage_names = sorted({k for r in records for k in r.get("stages", {})})
     # Billed calls only: timeouts and connection errors cost nothing.
     costs = [r["cost_usd"] for r in records if r["input_tokens"] or r["output_tokens"]]
@@ -160,8 +159,17 @@ def summarize(records: list[dict], server_deadline_s: float = RT_SERVER_DEADLINE
     honest_acc = _proportion(n_honest_correct, len(honest))
     fooled_p = _proportion(len(fooled), len(adversarial))
     mean_cost = sum(costs) / len(costs) if costs else None
-    llm_p95 = percentile(llm_latencies, 95)
     e2e_p95 = percentile(latencies, 95)
+    # Assumption 2 latency: a timed-out call's real latency is unknown but at least its
+    # timeout, so it counts as infinitely slow. Using the capped time instead would let a
+    # run in which every call timed out pass the latency check.
+    def llm_s(r: dict) -> float:
+        return r.get("stages", {}).get("llm_s", r["latency_s"])
+
+    timed_out = [llm_s(r) for r in records if (r["error"] or "").startswith("timeout")]
+    a2_latencies = [math.inf if (r["error"] or "").startswith("timeout") else llm_s(r) for r in records]
+    llm_p95 = percentile(a2_latencies, 95)
+    timeout_floor = min(timed_out, default=None)
 
     def ge(prop: dict, threshold: float) -> tuple[bool | None, bool | None]:
         if prop["rate"] is None:
@@ -174,7 +182,14 @@ def summarize(records: list[dict], server_deadline_s: float = RT_SERVER_DEADLINE
     a1_ci = None if a1 is None else (acc_ci_ok and fool_ci_ok)
 
     cost_ok = None if mean_cost is None else mean_cost < A2_MAX_COST_USD
-    lat_ok = None if llm_p95 is None else llm_p95 < A2_MAX_P95_LATENCY_S
+    if llm_p95 is None:
+        lat_ok = None
+    elif math.isinf(llm_p95):
+        # p95 is only known to be at least the timeout: broken if that is already over
+        # the threshold, otherwise this run cannot tell (rerun with a longer timeout).
+        lat_ok = False if timeout_floor >= A2_MAX_P95_LATENCY_S else None
+    else:
+        lat_ok = llm_p95 < A2_MAX_P95_LATENCY_S
     a2 = None if cost_ok is None or lat_ok is None else (cost_ok and lat_ok)
 
     # Decisions: what would have happened to the money, over every row.
@@ -240,7 +255,10 @@ def summarize(records: list[dict], server_deadline_s: float = RT_SERVER_DEADLINE
                 "status": _check(a2),
                 "mean_cost_usd": mean_cost,
                 "cost_status": _check(cost_ok),
-                "p95_llm_latency_s": llm_p95,
+                "p95_llm_latency_s": None if llm_p95 is None or math.isinf(llm_p95) else llm_p95,
+                # Set when timeouts push the p95 past what was measured: the p95 is at least this.
+                "p95_llm_latency_at_least_s": timeout_floor if llm_p95 is not None and math.isinf(llm_p95) else None,
+                "llm_timeouts": len(timed_out),
                 "latency_status": _check(lat_ok),
                 "thresholds": {"max_cost_usd": A2_MAX_COST_USD,
                                "max_p95_latency_s": A2_MAX_P95_LATENCY_S},
