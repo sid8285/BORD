@@ -154,8 +154,10 @@
       "status": "untested",
       "mean_cost_usd": null,
       "cost_status": "untested",
-      "p95_llm_latency_s": 6.507012333953753,
-      "latency_status": "holding",
+      "p95_llm_latency_s": null,
+      "p95_llm_latency_at_least_s": 6.504176666028798,
+      "llm_timeouts": 46,
+      "latency_status": "untested",
       "thresholds": {
         "max_cost_usd": 0.02,
         "max_p95_latency_s": 8.0
