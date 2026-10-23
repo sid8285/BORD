@@ -55,11 +55,16 @@ def test_assumption_4_is_about_detection_below_70_percent():
 
     # 2 of 5 caught: under 70%, but 5 attacks cannot rule out 70% at 95% confidence
     # (Wilson upper bound 0.77).
-    assert _assumption_4(summarize_anticheat(records(2, 5)))["status"] == "holding (not significant)"
-    assert _assumption_4(summarize_anticheat(records(2, 40)))["status"] == "holding"
-    assert _assumption_4(summarize_anticheat(records(38, 40)))["status"] == "broken"
+    few = _assumption_4(summarize_anticheat(records(2, 5)))
+    assert few["status"] == "Holding" and few["significant"] is False
+    many = _assumption_4(summarize_anticheat(records(2, 40)))
+    assert many["status"] == "Holding" and many["significant"] is True
+    assert _assumption_4(summarize_anticheat(records(38, 40)))["status"] == "Broken"
+    # 4 of 5 caught (80%) misses the threshold, but the interval (0.38-0.96) still
+    # includes rates under 70%: Weakened, not Broken.
+    assert _assumption_4(summarize_anticheat(records(4, 5)))["status"] == "Weakened"
     no_detector = [rec("adversarial", "ai_edited", {"ai_image": None})]
-    assert _assumption_4(summarize_anticheat(no_detector))["status"] == "untested"
+    assert _assumption_4(summarize_anticheat(no_detector))["status"] == "Untested"
 
 
 def test_summary_carries_the_new_blocks():

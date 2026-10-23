@@ -95,14 +95,46 @@ def _proportion(k: int, n: int) -> dict:
     return {"k": k, "n": n, "rate": _rate(k, n), "ci95": wilson_interval(k, n)}
 
 
-def _check(point_ok: bool | None, ci_ok: bool | None = None) -> str:
-    """holding / broken / untested on the point estimate; 'holding (not significant)'
-    when the point estimate passes but the 95% interval still crosses the threshold."""
+# Statuses use the checkpoint template's words, so summary.json and the report's
+# Technology Assumptions table say the same thing. "Strengthened" is not computed:
+# it is a judgment about new evidence, made in the report.
+HOLDING, WEAKENED, BROKEN, UNTESTED = "Holding", "Weakened", "Broken", "Untested"
+_SEVERITY = {HOLDING: 0, WEAKENED: 1, BROKEN: 2}
+
+
+def _check(point_ok: bool | None, ci_all_ok: bool | None = None, ci_any_ok: bool | None = None) -> str:
+    """Status of one threshold check.
+
+    ``point_ok``: does the point estimate meet the threshold. ``ci_all_ok`` / ``ci_any_ok``:
+    does all / any of the 95% interval meet it (None for checks without an interval).
+
+    - Holding: the point estimate meets the threshold. If the interval still crosses it,
+      the summary's ``significant`` field is False; the status stays Holding.
+    - Weakened: the point estimate misses, but the interval still includes the threshold,
+      so this sample cannot rule the assumption out.
+    - Broken: the point estimate misses and so does the whole interval (or there is no
+      interval to give it the benefit of the doubt).
+    - Untested: no data.
+    """
     if point_ok is None:
-        return "untested"
-    if not point_ok:
-        return "broken"
-    return "holding" if ci_ok in (None, True) else "holding (not significant)"
+        return UNTESTED
+    if point_ok:
+        return HOLDING
+    return WEAKENED if ci_any_ok else BROKEN
+
+
+def _significant(point_ok: bool | None, ci_all_ok: bool | None, ci_any_ok: bool | None) -> bool | None:
+    """True when the whole 95% interval is on the same side of the threshold as the point estimate."""
+    if point_ok is None or ci_all_ok is None:
+        return None
+    return ci_all_ok if point_ok else not ci_any_ok
+
+
+def _worst(*statuses: str) -> str:
+    """An assumption with several parts is only as good as its weakest part."""
+    if UNTESTED in statuses:
+        return UNTESTED
+    return max(statuses, key=_SEVERITY.__getitem__)
 
 
 def _latency_stats(values: list[float]) -> dict:
@@ -172,9 +204,10 @@ def _assumption_4(anticheat: dict) -> dict:
     caught = anticheat["signals"].get("ai_image", {}).get("by_category", {}).get("ai_edited", {})
     k, n, rate, ci = caught.get("k", 0), caught.get("n", 0), caught.get("rate"), caught.get("ci95")
     point_ok = None if rate is None else rate < A4_MAX_DETECTION_RATE
-    ci_ok = None if ci is None else ci[1] < A4_MAX_DETECTION_RATE
-    return {"status": _check(point_ok, ci_ok), "detected": {"k": k, "n": n, "rate": rate, "ci95": ci},
-            "threshold": A4_MAX_DETECTION_RATE}
+    ci_all = None if ci is None else ci[1] < A4_MAX_DETECTION_RATE
+    ci_any = None if ci is None else ci[0] < A4_MAX_DETECTION_RATE
+    return {"status": _check(point_ok, ci_all, ci_any), "significant": _significant(point_ok, ci_all, ci_any),
+            "detected": {"k": k, "n": n, "rate": rate, "ci95": ci}, "threshold": A4_MAX_DETECTION_RATE}
 
 
 def build_record(sub: Submission, result: VerifierResult) -> dict:
@@ -241,15 +274,15 @@ def summarize(records: list[dict], server_deadline_s: float = RT_SERVER_DEADLINE
     llm_p95 = percentile(a2_latencies, 95)
     timeout_floor = min(timed_out, default=None)
 
-    def ge(prop: dict, threshold: float) -> tuple[bool | None, bool | None]:
+    def ge(prop: dict, threshold: float) -> tuple[bool | None, bool | None, bool | None]:
+        """Point estimate, whole interval, any of the interval at or above the threshold."""
         if prop["rate"] is None:
-            return None, None
-        return prop["rate"] >= threshold, prop["ci95"][0] >= threshold
+            return None, None, None
+        return prop["rate"] >= threshold, prop["ci95"][0] >= threshold, prop["ci95"][1] >= threshold
 
-    acc_ok, acc_ci_ok = ge(honest_acc, A1_MIN_HONEST_ACCURACY)
-    fool_ok, fool_ci_ok = ge(fooled_p, A1_MIN_FOOLED_RATE)
-    a1 = None if acc_ok is None or fool_ok is None else (acc_ok and fool_ok)
-    a1_ci = None if a1 is None else (acc_ci_ok and fool_ci_ok)
+    acc = ge(honest_acc, A1_MIN_HONEST_ACCURACY)
+    fool = ge(fooled_p, A1_MIN_FOOLED_RATE)
+    acc_status, fool_status = _check(*acc), _check(*fool)
 
     cost_ok = None if mean_cost is None else mean_cost < A2_MAX_COST_USD
     if llm_p95 is None:
@@ -260,7 +293,6 @@ def summarize(records: list[dict], server_deadline_s: float = RT_SERVER_DEADLINE
         lat_ok = False if timeout_floor >= A2_MAX_P95_LATENCY_S else None
     else:
         lat_ok = llm_p95 < A2_MAX_P95_LATENCY_S
-    a2 = None if cost_ok is None or lat_ok is None else (cost_ok and lat_ok)
 
     # Decisions: what would have happened to the money, over every row.
     def decisions(rows: list[dict]) -> dict:
@@ -327,14 +359,14 @@ def summarize(records: list[dict], server_deadline_s: float = RT_SERVER_DEADLINE
         "cost_usd": {"mean_per_call": mean_cost, "total": sum(costs) if costs else 0.0},
         "assumptions": {
             "1": {
-                "status": _check(a1, a1_ci),
+                "status": _worst(acc_status, fool_status),
                 "honest_accuracy": {**honest_acc, "threshold": A1_MIN_HONEST_ACCURACY,
-                                    "status": _check(acc_ok, acc_ci_ok)},
+                                    "status": acc_status, "significant": _significant(*acc)},
                 "fooled_rate": {**fooled_p, "threshold": A1_MIN_FOOLED_RATE,
-                                "status": _check(fool_ok, fool_ci_ok)},
+                                "status": fool_status, "significant": _significant(*fool)},
             },
             "2": {
-                "status": _check(a2),
+                "status": _worst(_check(cost_ok), _check(lat_ok)),
                 "mean_cost_usd": mean_cost,
                 "cost_status": _check(cost_ok),
                 "p95_llm_latency_s": None if llm_p95 is None or math.isinf(llm_p95) else llm_p95,

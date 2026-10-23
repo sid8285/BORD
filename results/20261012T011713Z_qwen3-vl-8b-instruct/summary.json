@@ -107,7 +107,7 @@
     "holds": 46,
     "hold_rate": 1.0,
     "e2e_p95_s": 6.70187154202722,
-    "status": "holding"
+    "status": "Holding"
   },
   "decisions": {
     "honest": {
@@ -126,20 +126,72 @@
       0.11025900073475385
     ]
   },
+  "released_by_category": {
+    "reused": {
+      "k": 0,
+      "n": 11,
+      "rate": 0.0,
+      "ci95": [
+        2.7755575615628914e-17,
+        0.2588400172488141
+      ]
+    },
+    "web_sourced": {
+      "k": 0,
+      "n": 0,
+      "rate": null,
+      "ci95": null
+    },
+    "ai_edited": {
+      "k": 0,
+      "n": 5,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.43449149475208104
+      ]
+    },
+    "wrong_scene": {
+      "k": 0,
+      "n": 15,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.20388926630434784
+      ]
+    },
+    "staged_partial": {
+      "k": 0,
+      "n": 0,
+      "rate": null,
+      "ci95": null
+    }
+  },
+  "honest_completed_released": {
+    "k": 0,
+    "n": 12,
+    "rate": 0.0,
+    "ci95": [
+      0.0,
+      0.2425007574992425
+    ]
+  },
+  "anticheat": null,
   "cost_usd": {
     "mean_per_call": null,
     "total": 0.0
   },
   "assumptions": {
     "1": {
-      "status": "untested",
+      "status": "Untested",
       "honest_accuracy": {
         "k": 0,
         "n": 0,
         "rate": null,
         "ci95": null,
         "threshold": 0.9,
-        "status": "untested"
+        "status": "Untested",
+        "significant": null
       },
       "fooled_rate": {
         "k": 0,
@@ -147,17 +199,18 @@
         "rate": null,
         "ci95": null,
         "threshold": 0.3,
-        "status": "untested"
+        "status": "Untested",
+        "significant": null
       }
     },
     "2": {
-      "status": "untested",
+      "status": "Untested",
       "mean_cost_usd": null,
-      "cost_status": "untested",
+      "cost_status": "Untested",
       "p95_llm_latency_s": null,
       "p95_llm_latency_at_least_s": 6.504176666028798,
       "llm_timeouts": 46,
-      "latency_status": "untested",
+      "latency_status": "Untested",
       "thresholds": {
         "max_cost_usd": 0.02,
         "max_p95_latency_s": 8.0

@@ -120,7 +120,7 @@
     "holds": 0,
     "hold_rate": 0.0,
     "e2e_p95_s": 10.587626167107373,
-    "status": "holding"
+    "status": "Holding"
   },
   "decisions": {
     "honest": {
@@ -141,13 +141,64 @@
       0.3981276005869738
     ]
   },
+  "released_by_category": {
+    "reused": {
+      "k": 2,
+      "n": 11,
+      "rate": 0.18181818181818182,
+      "ci95": [
+        0.05136660067100063,
+        0.4769861375782448
+      ]
+    },
+    "web_sourced": {
+      "k": 0,
+      "n": 0,
+      "rate": null,
+      "ci95": null
+    },
+    "ai_edited": {
+      "k": 5,
+      "n": 5,
+      "rate": 1.0,
+      "ci95": [
+        0.5655085052479191,
+        1.0
+      ]
+    },
+    "wrong_scene": {
+      "k": 0,
+      "n": 15,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.20388926630434784
+      ]
+    },
+    "staged_partial": {
+      "k": 0,
+      "n": 0,
+      "rate": null,
+      "ci95": null
+    }
+  },
+  "honest_completed_released": {
+    "k": 12,
+    "n": 12,
+    "rate": 1.0,
+    "ci95": [
+      0.7574992425007574,
+      1.0
+    ]
+  },
+  "anticheat": null,
   "cost_usd": {
     "mean_per_call": 0.0,
     "total": 0.0
   },
   "assumptions": {
     "1": {
-      "status": "broken",
+      "status": "Weakened",
       "honest_accuracy": {
         "k": 15,
         "n": 15,
@@ -157,7 +208,8 @@
           1.0
         ],
         "threshold": 0.9,
-        "status": "holding (not significant)"
+        "status": "Holding",
+        "significant": false
       },
       "fooled_rate": {
         "k": 7,
@@ -168,17 +220,18 @@
           0.3981276005869738
         ],
         "threshold": 0.3,
-        "status": "broken"
+        "status": "Weakened",
+        "significant": false
       }
     },
     "2": {
-      "status": "broken",
+      "status": "Broken",
       "mean_cost_usd": 0.0,
-      "cost_status": "holding",
+      "cost_status": "Holding",
       "p95_llm_latency_s": 10.419566459022462,
       "p95_llm_latency_at_least_s": null,
       "llm_timeouts": 0,
-      "latency_status": "broken",
+      "latency_status": "Broken",
       "thresholds": {
         "max_cost_usd": 0.02,
         "max_p95_latency_s": 8.0
