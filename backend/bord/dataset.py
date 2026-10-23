@@ -8,8 +8,15 @@ docs/dataset_spec.md:
 - Adversarial rows (``set=adversarial``) are cheating attempts built on an
   honest pair (``base_pair_id``), labeled with one of the spec's categories.
   The correct verdict for every adversarial row is ``not_completed``: the wager
-  must not be released for a reused, web-sourced, AI-edited, wrong-scene or
-  staged-partial submission.
+  must not be released for a reused, web-sourced, AI-edited, wrong-scene,
+  staged-partial, resubmitted or recaptured submission.
+
+Checkpoint 3 added two categories for the grader's "test actual resubmissions":
+``resubmitted`` (the same task on a later day, submitted with the earlier
+attempt's after photo) and ``recaptured`` (that earlier photo shown on a screen
+and photographed again, the way a camera-only app would be cheated). The
+Checkpoint 2 ``reused`` category, built from another task in the same scene, is
+kept so the baseline can be compared run to run.
 
 Image paths are relative to the manifest file's directory.
 """
@@ -29,6 +36,8 @@ ADVERSARIAL_CATEGORIES = (
     "ai_edited",
     "wrong_scene",
     "staged_partial",
+    "resubmitted",
+    "recaptured",
 )
 CAPTURE_SOURCES = ("phone", "browser", "web", "generated")
 

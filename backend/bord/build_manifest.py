@@ -46,7 +46,7 @@ EXIF_IFD = 0x8769
 GPS_IFD = 0x8825
 DATETIME_ORIGINAL = 36867
 DATETIME = 306
-HAND_MADE = {"staged_partial": "phone", "ai_edited": "generated"}
+HAND_MADE = {"staged_partial": "phone", "ai_edited": "generated", "recaptured": "phone"}
 
 
 def capture_time(path: Path) -> str:
@@ -110,6 +110,8 @@ def honest_rows(data: Path) -> tuple[list[dict], list[str]]:
                 "label": r["label"], "adversarial_category": "", "base_pair_id": "",
                 "capture_source": "phone", "before_captured_at": b_t, "after_captured_at": a_t,
                 "_scene": r.get("scene_id") or r["task_description"].lower(),
+                # Optional: pairs that share a task_id are the same task done on different days.
+                "_task": r.get("task_id") or "",
             })
     return rows, warnings
 
@@ -135,6 +137,17 @@ def adversarial_rows(data: Path, honest: list[dict]) -> list[dict]:
         if earlier:
             src = earlier[-1]
             rows.append(_attack(later, src["after_path"], "reused", f"reused-{src['pair_id']}", "phone"))
+
+    # resubmitted: the same task (task_id) done again later, submitted with the most recent
+    # earlier completed attempt's after photo. Unlike "reused", the photo really is a past
+    # proof of this exact task, which is what a cheater would resubmit.
+    for i, later in enumerate(ordered):
+        if not later["_task"]:
+            continue
+        earlier = [e for e in ordered[:i] if e["_task"] == later["_task"] and e["label"] == "completed"]
+        if earlier:
+            src = earlier[-1]
+            rows.append(_attack(later, src["after_path"], "resubmitted", f"resubmitted-{src['pair_id']}", "phone"))
 
     # wrong_scene: the next completed pair (in id order) from a different scene.
     by_id = sorted(honest, key=lambda r: r["pair_id"])

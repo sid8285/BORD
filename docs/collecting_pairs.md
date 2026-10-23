@@ -19,7 +19,14 @@ A reasonable CP2 mix is 15 pairs across 4 or 5 scenes, about 12 `completed` and 
 ## Adversarial set
 
 The **automatic** categories come from your honest pairs, with nothing extra to photograph:
-- `reused`: a later attempt submitted with an earlier attempt's after photo from the same scene
+- `reused`: a later attempt submitted with an earlier attempt's after photo from the same scene (any task; kept for comparison with Checkpoint 2)
+- `resubmitted`: a later attempt at the **same task** submitted with that task's earlier after photo. It needs a `task_id` column in `pairs.csv`: give the same id to every pair that is the same task done on a different day, for example
+
+```csv
+pair_id,task_type,task_description,label,scene_id,task_id
+p016,single_scene,Close the laptop,completed,desk,laptop
+p024,single_scene,Close the laptop,completed,desk,laptop
+```
 - `wrong_scene`: a before photo paired with an after photo from a different scene
 
 The **semi-automatic** category needs downloaded images:
@@ -28,6 +35,7 @@ The **semi-automatic** category needs downloaded images:
 The **by hand** categories are optional, but they add the categories the baseline is most likely to miss:
 - `staged_partial`: clean only the photographed corner, then save it as `data/adversarial/<pair_id>-staged_partial.jpg`.
 - `ai_edited`: edit the real before photo with an image model so it looks clean, then save it as `data/adversarial/<pair_id>-ai_edited.jpg`.
+- `recaptured`: for a repeated task, open the **earlier** attempt's after photo full screen on a laptop or another phone, photograph the screen with the camera, and save it as `data/adversarial/<pair_id>-recaptured.jpg`, where `<pair_id>` is the **later** attempt. Vary it: fill the frame on some, show the screen edge on others.
 
 Then build and check the manifest:
 

@@ -19,6 +19,8 @@ Each honest pair is the base for cheating attempts. Each attempt is labeled with
 - **AI-edited:** the real "before" photo edited by an image model to look clean.
 - **Wrong scene:** an after photo of a different, already-clean room.
 - **Staged partial:** only the photographed area is cleaned.
+- **Resubmitted** (added in Checkpoint 3): the same task done again on a later day, submitted with the earlier attempt's after photo.
+- **Recaptured** (added in Checkpoint 3): that earlier after photo shown on a screen and photographed again. In a camera-only app this is how an old photo gets back in, and it does not hash like the original file.
 
 ## 4. Public set
 - [Messy vs Clean Room (Kaggle)](https://www.kaggle.com/datasets/cdawn1/messy-vs-clean-room): unpaired messy/clean room images, used as web-sourced adversarial material and for sanity checks.

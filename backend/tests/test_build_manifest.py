@@ -57,3 +57,42 @@ def test_warns_about_gps_location(tmp_path, capsys):
     img.save(tmp_path / "pairs" / "p01" / "after.jpg", exif=exif)
     assert main(["--data", str(tmp_path)]) == 0
     assert "GPS location" in capsys.readouterr().err
+
+
+def test_resubmitted_and_recaptured_come_from_the_same_task(tmp_path):
+    data = tmp_path
+    (data / "pairs.csv").write_text(
+        "pair_id,task_type,task_description,label,scene_id,task_id\n"
+        "p01,single_scene,Close the laptop,completed,desk,laptop\n"
+        "p02,single_scene,Put the mug away,completed,desk,\n"
+        "p03,single_scene,Close the laptop,completed,desk,laptop\n"
+        "p04,single_scene,Close the laptop,not_completed,desk,laptop\n"
+    )
+    days = {"p01": "01", "p02": "02", "p03": "03", "p04": "04"}
+    for pid, d in days.items():
+        _photo(data / "pairs" / pid / "before.jpg", f"2026:10:{d} 09:00:00")
+        _photo(data / "pairs" / pid / "after.jpg", f"2026:10:{d} 10:00:00")
+    _photo(data / "adversarial" / "p03-recaptured.jpg")
+
+    assert main(["--data", str(data)]) == 0
+    by_id = {s.pair_id: s for s in load_manifest(data / "manifest.csv")}
+    resubmitted = sorted(p for p, s in by_id.items() if s.adversarial_category == "resubmitted")
+    # Each later laptop attempt resubmits the most recent earlier completed laptop photo,
+    # never the mug photo that sits between them in the same scene.
+    assert resubmitted == ["p03-resubmitted-p01", "p04-resubmitted-p03"]
+    assert by_id["p04-resubmitted-p03"].after_path == data / "pairs/p03/after.jpg"
+    assert by_id["p04-resubmitted-p03"].before_path == data / "pairs/p04/before.jpg"
+    assert by_id["p03-recaptured"].capture_source == "phone"
+    assert by_id["p03-recaptured"].base_pair_id == "p03"
+
+
+def test_pairs_without_task_id_build_no_resubmissions(tmp_path):
+    (tmp_path / "pairs.csv").write_text("pair_id,task_type,task_description,label,scene_id\n"
+                                        "p01,single_scene,Clean my desk,completed,desk\n"
+                                        "p02,single_scene,Clean my desk,completed,desk\n")
+    for pid, d in (("p01", "01"), ("p02", "02")):
+        _photo(tmp_path / "pairs" / pid / "before.jpg", f"2026:10:{d} 09:00:00")
+        _photo(tmp_path / "pairs" / pid / "after.jpg", f"2026:10:{d} 10:00:00")
+    assert main(["--data", str(tmp_path)]) == 0
+    cats = [s.adversarial_category for s in load_manifest(tmp_path / "manifest.csv")]
+    assert "resubmitted" not in cats and "reused" in cats

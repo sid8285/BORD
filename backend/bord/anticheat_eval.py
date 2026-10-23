@@ -54,13 +54,16 @@ def calibration(records: list[dict]) -> dict:
 
     scene_consistency flags scores *below* the threshold: it should sit above the highest
     wrong_scene score and below the lowest honest one. reuse flags distances *at or below*
-    the threshold: it should be at least the largest reused distance and below the smallest
-    honest one. Small samples: treat a suggestion as a starting point, not a result.
+    the threshold: it should be at least the largest distance of any old-photo attack (reused,
+    resubmitted, recaptured) and below the smallest honest one. Small samples: treat a suggestion as a starting point, not a result.
     """
     honest_scene = _scores(records, "scene_consistency", None, honest=True)
     wrong_scene = _scores(records, "scene_consistency", "wrong_scene", honest=False)
     honest_dist = _scores(records, "reuse", None, honest=True)
-    reused_dist = _scores(records, "reuse", "reused", honest=False)
+    # Every attack that submits an old photo: copied files (reused, resubmitted) and
+    # re-photographed screens (recaptured), which do not hash to the same bits.
+    old_photo = {cat: _scores(records, "reuse", cat, honest=False) for cat in ("reused", "resubmitted", "recaptured")}
+    reused_dist = [d for dists in old_photo.values() for d in dists]
 
     scene_hint = None
     if honest_scene and wrong_scene:
@@ -73,10 +76,13 @@ def calibration(records: list[dict]) -> dict:
         if max(reused_dist) < min(honest_dist):
             reuse_hint = {"separable": True, "suggested_reuse_max_distance": int(max(reused_dist))}
         else:
-            reuse_hint = {"separable": False, "note": "a reused photo is no closer than the closest honest one"}
+            reuse_hint = {"separable": False, "note": "an old photo (reused, resubmitted or recaptured) is no "
+                                                      "closer than the closest honest one"}
     return {
         "scene_consistency": {"honest": _range(honest_scene), "wrong_scene": _range(wrong_scene), **(scene_hint or {})},
-        "reuse_distance": {"honest": _range(honest_dist), "reused": _range(reused_dist), **(reuse_hint or {})},
+        "reuse_distance": {"honest": _range(honest_dist),
+                           **{cat: _range(dists) for cat, dists in old_photo.items()},
+                           **(reuse_hint or {})},
         "ai_image": {"honest": _range(_scores(records, "ai_image", None, honest=True)),
                      "ai_edited": _range(_scores(records, "ai_image", "ai_edited", honest=False))},
     }

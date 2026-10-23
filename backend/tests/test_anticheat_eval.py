@@ -145,3 +145,17 @@ def test_offline_benchmark_end_to_end(tmp_path):
     assert summary["anticheat"]["signals"]["reuse"]["by_category"]["reused"]["k"] == 1
     assert summary["anticheat"]["signals"]["ai_image"]["honest"]["n"] == 0  # no detector configured
     assert summary["calibration"]["reuse_distance"]["reused"]["max"] == 0
+
+
+def test_calibration_covers_recaptured_photos():
+    """A re-photographed screen does not hash like the file it shows: the reuse threshold
+    has to come from the recaptured distances, not just the copied files."""
+    honest = [rec("honest", None, {"reuse": False}, scores={"reuse": d}) for d in (16.0, 22.0)]
+    copies = [rec("adversarial", "resubmitted", {"reuse": True}, scores={"reuse": 0.0})]
+    recaptured = [rec("adversarial", "recaptured", {"reuse": False}, scores={"reuse": d}) for d in (9.0, 12.0)]
+    c = calibration(honest + copies + recaptured)["reuse_distance"]
+    assert c["resubmitted"] == {"n": 1, "min": 0.0, "max": 0.0}
+    assert c["recaptured"] == {"n": 2, "min": 9.0, "max": 12.0}
+    assert c["separable"] is True and c["suggested_reuse_max_distance"] == 12
+    c = calibration(honest + recaptured + [rec("adversarial", "recaptured", {"reuse": False}, scores={"reuse": 18.0})])
+    assert c["reuse_distance"]["separable"] is False
