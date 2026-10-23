@@ -15,6 +15,7 @@ CS 4220/6235 Real Time Embedded Systems, Fall 2026, Group 34 (solo).
 
 Checkpoint 1: planning only (submitted at `5f4de2bf`).
 Checkpoint 2: LLM-only baseline verifier, evaluation harness, real-time deadline handling and the first evaluation runs.
+Checkpoint 3: anti-cheating layer, camera-only capture flow and the latency re-measurement tooling (see below).
 
 ## Docs
 
@@ -23,6 +24,7 @@ Checkpoint 2: LLM-only baseline verifier, evaluation harness, real-time deadline
 - [Technology assumptions and platforms](docs/assumptions.md)
 - [Real-time budget](docs/realtime_budget.md)
 - [Collecting pairs](docs/collecting_pairs.md)
+- [Anti-cheating layer](docs/anticheat.md)
 
 ## Planned stack
 
@@ -66,3 +68,30 @@ ANTHROPIC_API_KEY=... python -m bord.evaluate --manifest ../data/manifest.csv --
 For local providers the harness makes one untimed warm-up call first, so model loading is not counted as verdict latency, and it records the machine (`run.host`) in `summary.json`.
 
 Commit each `results/<run_id>/` folder, `docs/results_cp2.md` and `data/manifest.csv`. They are the evidence for Assumptions 1 and 2 and the real-time budget.
+
+## Checkpoint 3: anti-cheating layer and capture flow
+
+Details and the signal table are in [docs/anticheat.md](docs/anticheat.md).
+
+- `backend/bord/challenge.py`: server-issued, single-use capture challenges (code plus angle prompt) and server-clock ordering of the before and after captures.
+- `backend/bord/imaging.py`: Pillow-only fingerprints, a 64-bit dhash for reuse and a scene-similarity score for the before/after consistency check.
+- `backend/bord/detectors.py`: the optional pixel AI-image detector (Hugging Face model, `requirements-detector.txt`) and the file-metadata diagnostic.
+- `backend/bord/anticheat.py`: runs the signals as stage 4 of the real-time pipeline; `ManifestHistory` stands in for a user's submission log in the offline benchmark.
+- `backend/bord/anticheat_eval.py`: measures the signals on the manifest without an LLM and prints threshold calibration data.
+- `backend/bord/api.py`: FastAPI service (`/api/challenges`, `/api/captures`, `/api/submissions`, `/api/device-reports`).
+- `frontend/`: React capture flow with no file upload (`getUserMedia`, challenge code drawn into the frame) and the `?device-test` page for Assumption 3.
+- `backend/bord/latency_sweep.py`: re-runs the manifest across model size, image size and host for Assumption 2.
+
+```bash
+cd backend
+pip install -r requirements.txt
+pytest                                                    # offline tests, no model server needed
+python -m bord.anticheat_eval --manifest ../data/manifest.csv --out ../results
+python -m bord.evaluate --manifest ../data/manifest.csv --out ../results --llm-timeout 60 --deadline 70 --anticheat
+python -m bord.latency_sweep --manifest ../data/manifest.csv --out ../results
+uvicorn bord.api:app --port 8000                          # API on :8000
+
+cd ../frontend && npm install && npm run dev              # app on :5173, proxies /api to :8000
+```
+
+`getUserMedia` needs https or localhost; use a tunnel or a local certificate to try it on a phone.

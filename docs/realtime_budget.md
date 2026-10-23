@@ -9,7 +9,7 @@ BORD's verdict is a **firm real-time deadline**: within **10 s at p95** of the u
 | 1 | Capture checks (liveness, frame hash) | Browser | 1.0 s | Browser timer (CP3/CP4) | Re-prompt the capture |
 | 2 | Upload two photos | Browser to server | 1.0 s | `fetch` timeout (CP4) | Retry upload once, then hold |
 | 3 | Preprocess (decode, orient, downscale to 1568 px, re-encode) | Server | 0.5 s | Measured per call (`stages.preprocess_s`) | Counted against the deadline |
-| 4 | Anti-cheating checks | Server | 0.5 s | Reserved for CP3, unused now | Hold |
+| 4 | Anti-cheating checks ([anticheat.md](anticheat.md)) | Server | 0.5 s | Measured per call (`stages.anticheat_s`); `summary.json` counts overruns | A flag turns a release into a hold |
 | 5 | LLM verdict call (Qwen3-VL 8B, local) | Server to model server | 6.5 s first attempt | Request timeout (`--llm-timeout`) | One retry if time remains, else hold |
 | 6 | Decision and Stripe capture/cancel | Server | 0.5 s | Reserved (`Budget.decision_s`) | Hold; the authorization stays valid for 7 days (Assumption 5) |
 | | **Total** | | **10.0 s** | | |

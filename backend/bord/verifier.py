@@ -81,6 +81,8 @@ class VerifierResult:
     attempts: int = 1
     deadline_missed: bool = False
     stages: dict = field(default_factory=dict)  # stage name -> seconds
+    # Filled when the anti-cheating stage ran (bord.anticheat.AntiCheatReport.to_dict()).
+    anticheat: dict = field(default_factory=dict)
 
     def to_dict(self) -> dict:
         return asdict(self)

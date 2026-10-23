@@ -1,0 +1,4 @@
+# Optional: pixel AI-image detector for the ai_image signal (python -m bord.anticheat_eval --detector hf).
+# Heavy (torch); the rest of the backend and the offline tests do not need it.
+transformers>=4.44,<6
+torch>=2.3,<3

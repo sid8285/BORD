@@ -32,12 +32,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable, Protocol
 
+from .anticheat import AntiCheat, AntiCheatConfig, ManifestHistory
 from .dataset import ADVERSARIAL_CATEGORIES, Submission, load_manifest
+from .detectors import HFImageDetector
 from .qwen_verifier import PROVIDERS, QwenVerifier
 from .realtime import HOLD, RELEASE, Budget, RealtimeVerifier, Thresholds
 from .verifier import (
     DEFAULT_EFFORT,
     DEFAULT_MODEL,
+    MAX_IMAGE_SIDE,
     LLMOnlyVerifier,
     VerifierResult,
 )
@@ -47,6 +50,7 @@ A1_MIN_HONEST_ACCURACY = 0.90
 A1_MIN_FOOLED_RATE = 0.30
 A2_MAX_COST_USD = 0.02
 A2_MAX_P95_LATENCY_S = 8.0
+A4_MAX_DETECTION_RATE = 0.70  # Assumption 4: detectors catch fewer than 70% of edited images
 # Real-time budget (docs/realtime_budget.md): server share of the 10 s verdict deadline.
 RT_SERVER_DEADLINE_S = Budget().server_deadline_s
 WILSON_Z = 1.96  # 95% interval
@@ -105,6 +109,69 @@ def _latency_stats(values: list[float]) -> dict:
         "p95": percentile(values, 95),
         "max": max(values) if values else None,
     }
+
+
+def _signal_flag(record: dict, name: str | None) -> bool | None:
+    """Did this record's anti-cheating report flag it (overall when name is None, else
+    by one signal)? None when the signal did not apply to the row."""
+    report = record["anticheat"]
+    if name is None:
+        return report["flagged"]
+    signal = next((s for s in report["signals"] if s["name"] == name), None)
+    return None if signal is None else signal["flagged"]
+
+
+def summarize_anticheat(records: list[dict]) -> dict | None:
+    """Flag rates of the Checkpoint 3 anti-cheating stage, over the rows it ran on.
+
+    For the overall flag and for each signal: the share of honest submissions flagged
+    (false alarms; each should be near 0), the share of adversarial submissions flagged
+    (detections) and the same per attack category, all with 95% Wilson intervals.
+    Rows a signal does not apply to (e.g. no detector installed) are left out of its n.
+    """
+    rows = [r for r in records if r.get("anticheat")]
+    if not rows:
+        return None
+    honest = [r for r in rows if r["set"] == "honest"]
+    adversarial = [r for r in rows if r["set"] == "adversarial"]
+
+    def flagged_share(subset: list[dict], name: str | None) -> dict:
+        applicable = [r for r in subset if _signal_flag(r, name) is not None]
+        return _proportion(sum(1 for r in applicable if _signal_flag(r, name)), len(applicable))
+
+    def block(name: str | None) -> dict:
+        return {
+            "honest": flagged_share(honest, name),
+            "adversarial": flagged_share(adversarial, name),
+            "by_category": {
+                cat: flagged_share([r for r in adversarial if r["adversarial_category"] == cat], name)
+                for cat in ADVERSARIAL_CATEGORIES
+            },
+        }
+
+    names = sorted({s["name"] for r in rows for s in r["anticheat"]["signals"]})
+    elapsed = [r["stages"]["anticheat_s"] for r in rows if "anticheat_s" in r.get("stages", {})]
+    return {
+        "overall": block(None),
+        "signals": {name: block(name) for name in names},
+        "stage_s": _latency_stats(elapsed),
+        "over_budget": sum(1 for s in elapsed if s > Budget().anticheat_s),
+        "n": len(rows),
+    }
+
+
+def _assumption_4(anticheat: dict) -> dict:
+    """Assumption 4: open-source detectors catch fewer than 70% of edited images.
+
+    Measured as the share of the AI-edited attacks the pixel detector flagged. The
+    assumption holds when that share is below the threshold.
+    """
+    caught = anticheat["signals"].get("ai_image", {}).get("by_category", {}).get("ai_edited", {})
+    k, n, rate, ci = caught.get("k", 0), caught.get("n", 0), caught.get("rate"), caught.get("ci95")
+    point_ok = None if rate is None else rate < A4_MAX_DETECTION_RATE
+    ci_ok = None if ci is None else ci[1] < A4_MAX_DETECTION_RATE
+    return {"status": _check(point_ok, ci_ok), "detected": {"k": k, "n": n, "rate": rate, "ci95": ci},
+            "threshold": A4_MAX_DETECTION_RATE}
 
 
 def build_record(sub: Submission, result: VerifierResult) -> dict:
@@ -202,6 +269,13 @@ def summarize(records: list[dict], server_deadline_s: float = RT_SERVER_DEADLINE
     honest_all = [r for r in records if r["set"] == "honest"]
     adv_all = [r for r in records if r["set"] == "adversarial"]
     released_adv = sum(1 for r in adv_all if r.get("decision") == RELEASE)
+    released_by_category = {}
+    for cat in ADVERSARIAL_CATEGORIES:
+        rows = [r for r in adv_all if r["adversarial_category"] == cat]
+        released_by_category[cat] = _proportion(sum(1 for r in rows if r.get("decision") == RELEASE), len(rows))
+    honest_done = [r for r in honest_all if r["label"] == "completed"]
+    honest_release_rate = _proportion(sum(1 for r in honest_done if r.get("decision") == RELEASE), len(honest_done))
+    anticheat = summarize_anticheat(records)
     misses = sum(1 for r in records if r.get("deadline_missed"))
     holds = sum(1 for r in records if r.get("decision") == HOLD)
     retried = sum(1 for r in records if r.get("attempts", 1) > 1)
@@ -242,6 +316,11 @@ def summarize(records: list[dict], server_deadline_s: float = RT_SERVER_DEADLINE
         },
         "decisions": {"honest": decisions(honest_all), "adversarial": decisions(adv_all)},
         "adversarial_released": _proportion(released_adv, len(adv_all)),
+        # Checkpoint 3: the same rates per attack category, and how often an honest,
+        # completed task still gets its wager released (the anti-cheating layer's cost).
+        "released_by_category": released_by_category,
+        "honest_completed_released": honest_release_rate,
+        "anticheat": anticheat,
         "cost_usd": {"mean_per_call": mean_cost, "total": sum(costs) if costs else 0.0},
         "assumptions": {
             "1": {
@@ -263,6 +342,7 @@ def summarize(records: list[dict], server_deadline_s: float = RT_SERVER_DEADLINE
                 "thresholds": {"max_cost_usd": A2_MAX_COST_USD,
                                "max_p95_latency_s": A2_MAX_P95_LATENCY_S},
             },
+            **({"4": _assumption_4(anticheat)} if anticheat else {}),
         },
     }
 
@@ -313,10 +393,36 @@ def build_verifier(args) -> tuple[object, dict]:
         v = LLMOnlyVerifier(model=model, effort=args.effort, timeout_s=args.llm_timeout)
         return v, {"provider": "anthropic", "model": model, "effort": args.effort}
     v = QwenVerifier(provider=args.provider, model=args.model, base_url=args.base_url,
-                     timeout_s=args.llm_timeout, json_mode=args.json_mode)
+                     timeout_s=args.llm_timeout, json_mode=args.json_mode,
+                     max_image_side=args.max_image_side)
     return v, {"provider": args.provider, "model": v.model, "json_mode": v.json_mode,
                "base_url": args.base_url or PROVIDERS[args.provider].base_url,
-               "price_per_mtok": list(v.prices)}
+               "price_per_mtok": list(v.prices), "max_image_side": v.max_image_side}
+
+
+def add_anticheat_args(parser: argparse.ArgumentParser) -> None:
+    """Flags shared by bord.evaluate and bord.anticheat_eval."""
+    cfg = AntiCheatConfig()
+    parser.add_argument("--detector", choices=["none", "hf"], default="none",
+                        help="pixel AI-image detector for the ai_image signal; 'hf' needs "
+                             "requirements-detector.txt (default: none, the signal is skipped)")
+    parser.add_argument("--detector-model", default="umm-maybe/AI-image-detector",
+                        help="Hugging Face model id for --detector hf")
+    parser.add_argument("--reuse-max-distance", default=cfg.reuse_max_distance, type=int,
+                        help="flag a photo whose dhash is within this many of 64 bits of a past one")
+    parser.add_argument("--scene-min", default=cfg.scene_min_score, type=float,
+                        help="flag a pair whose scene similarity is below this")
+    parser.add_argument("--ai-min", default=cfg.ai_min_score, type=float,
+                        help="flag a photo whose detector P(AI) is at least this")
+
+
+def build_anticheat(args) -> tuple[AntiCheat, dict]:
+    detector = HFImageDetector(args.detector_model) if args.detector == "hf" else None
+    config = AntiCheatConfig(reuse_max_distance=args.reuse_max_distance,
+                             scene_min_score=args.scene_min, ai_min_score=args.ai_min)
+    meta = {"reuse_max_distance": config.reuse_max_distance, "scene_min_score": config.scene_min_score,
+            "ai_min_score": config.ai_min_score, "detector": detector.name if detector else None}
+    return AntiCheat(config, detector), meta
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -341,10 +447,18 @@ def main(argv: list[str] | None = None) -> int:
                         help="server-side firm deadline, seconds")
     parser.add_argument("--release-min-conf", default=0.0, type=float)
     parser.add_argument("--forfeit-min-conf", default=0.0, type=float)
+    parser.add_argument("--max-image-side", default=MAX_IMAGE_SIDE, type=int,
+                        help="long side in pixels of the photos sent to a Qwen model (fewer pixels, "
+                             "fewer image tokens, faster calls); 768 is about 4x fewer tokens than 1568")
+    parser.add_argument("--anticheat", action=argparse.BooleanOptionalAction, default=False,
+                        help="run the Checkpoint 3 anti-cheating stage before the LLM call; without "
+                             "it the run reproduces the Checkpoint 2 baseline on the same manifest")
+    add_anticheat_args(parser)
     parser.add_argument("--limit", type=int, help="only the first N rows (smoke test)")
     args = parser.parse_args(argv)
 
     submissions = load_manifest(args.manifest)
+    history_for = ManifestHistory(submissions)  # built before --limit so history is complete
     if args.limit:
         submissions = submissions[: args.limit]
 
@@ -360,13 +474,17 @@ def main(argv: list[str] | None = None) -> int:
 
     started = datetime.now(timezone.utc)
     safe_model = re.sub(r"[^A-Za-z0-9._-]+", "-", model_meta["model"])
-    run_id = started.strftime("%Y%m%dT%H%M%SZ") + f"_{safe_model}"
+    anticheat, anticheat_meta = build_anticheat(args) if args.anticheat else (None, None)
+    run_id = (started.strftime("%Y%m%dT%H%M%SZ") + f"_{safe_model}"
+              + (f"_{args.max_image_side}px" if model_meta.get("max_image_side", MAX_IMAGE_SIDE) != MAX_IMAGE_SIDE else "")
+              + ("_anticheat" if anticheat else ""))
     out_dir = args.out / run_id
     meta = {
         "run_id": run_id,
         "started_at": started.isoformat(),
         "manifest": str(args.manifest),
-        "verifier": "llm_only_baseline",
+        "verifier": "llm_plus_anticheat" if anticheat else "llm_only_baseline",
+        "anticheat": anticheat_meta,
         **model_meta,
         "warmup": warmup_meta,
         "host": host_info(),
@@ -380,10 +498,13 @@ def main(argv: list[str] | None = None) -> int:
         model_verifier,
         budget=budget,
         thresholds=Thresholds(args.release_min_conf, args.forfeit_min_conf),
+        anticheat=anticheat,
+        history_for=history_for if anticheat else None,
     )
     summary = run(submissions, verifier, out_dir, meta)
 
     print(json.dumps({k: summary[k] for k in ("honest_accuracy", "fooled_rate",
+                                               "adversarial_released", "released_by_category",
                                                "latency_s", "realtime", "cost_usd",
                                                "assumptions")}, indent=2))
     print(f"wrote {out_dir}", file=sys.stderr)
