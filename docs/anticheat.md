@@ -5,6 +5,7 @@ The LLM alone is the baseline that Assumption 1 says is easy to fool. These chec
 | Signal | Question | Catches | Where |
 |---|---|---|---|
 | `challenge` | Did the server issue this capture, and is the returned code right, single-use and fresh? | Photos made in advance, replayed uploads | `bord/challenge.py` |
+| `stamp` | Does the code read back out of each photo's pixels match that capture's challenge? | An earlier in-app capture uploaded again (it carries its old code), an upload that skipped the capture page | `bord/stamp.py`, read on upload in `bord/api.py` |
 | `server_timestamps` | Was the AFTER photo received after the BEFORE one, with a plausible gap (2 s to 1 h), on the server clock? | Out-of-order or instant pairs | `bord/challenge.py` (`check_order`) |
 | `reuse` | Is the AFTER photo within 3 of 64 dhash bits of a photo the user already submitted? | Reused photos (also re-encoded or resized copies) | `bord/imaging.py`, `bord/anticheat.py` |
 | `scene_consistency` | Do BEFORE and AFTER show the same scene (blurred luminance correlation plus colour histogram overlap)? | Wrong scene | `bord/imaging.py`, `bord/anticheat.py` |
@@ -19,9 +20,10 @@ In Checkpoint 3 a flag can only turn a release into a hold (`bord/realtime.py`).
 
 ## Why the browser flow looks the way it does
 
-- There is no file upload in the app. `frontend/src/CameraCapture.jsx` opens `getUserMedia`, draws the challenge code into the pixels of the captured frame, and posts it at once to `/api/captures`.
+- There is no file upload in the app. `frontend/src/CameraCapture.jsx` opens `getUserMedia`, draws the challenge code into the pixels of the captured frame (as text, and as a strip of black and white cells the server can read), and posts it at once to `/api/captures`.
 - The server redeems the challenge when the photo arrives, so `received_at` is the capture time as far as the server can tell. It never reads a client clock or filename.
-- The code is checked against the challenge store. It is **not yet read back out of the photo**: nothing on the server checks that the stamped code is really visible in the pixels, so a determined attacker could redeem a code and upload an older photo. Reading the code from the frame (OCR or a second small vision call run in parallel with the verdict call) is planned work.
+- The code is checked against the challenge store, and on upload the server also reads it back out of the photo's cell strip (`bord/stamp.py`, about 10 ms for a 1920 px frame, off the verdict's critical path). An earlier capture uploaded again carries its old code, and a photo that skipped the capture page carries none; either flags the `stamp` signal.
+- What the stamp cannot stop: a modified client can draw any code on any image, and an old photo shown on a screen and captured through the app gets a fresh, valid stamp. Those attacks are the `recaptured` category in the benchmark, and they are left to the reuse and scene checks and the verdict model.
 
 ## Measuring the signals
 

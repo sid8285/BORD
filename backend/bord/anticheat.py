@@ -9,6 +9,8 @@ signal             question                                            catches
 =================  ==================================================  ============
 challenge          did the server issue this capture, and is the       pre-made photos,
                    returned code right, single use, fresh?             replayed uploads
+stamp              does the code read back out of each photo's         old in-app captures
+                   pixels match its challenge? (bord.stamp)            uploaded again
 server_timestamps  did the AFTER photo arrive later than the BEFORE    out-of-order or
                    one, by a plausible gap, on the server clock?       instant pairs
 reuse              is the AFTER photo (near-)identical to one the      reused photos
@@ -38,6 +40,7 @@ from .challenge import Redemption, check_order
 from .dataset import Submission
 from .detectors import ImageDetector, file_metadata, looks_camera_made
 from .imaging import file_dhash, hamming, load_thumb, scene_similarity
+from .stamp import StampCheck
 
 
 @dataclass(frozen=True)
@@ -56,10 +59,13 @@ class AntiCheatConfig:
 
 @dataclass(frozen=True)
 class ChallengeEvidence:
-    """What the API collected for one submission: the redemption of each capture's challenge."""
+    """What the API collected for one submission: the redemption of each capture's challenge,
+    and the code read back out of each photo (None when the stamp was not checked)."""
 
     before: Redemption
     after: Redemption
+    before_stamp: StampCheck | None = None
+    after_stamp: StampCheck | None = None
 
 
 @dataclass
@@ -107,12 +113,13 @@ class AntiCheat:
         t0 = time.perf_counter()
         checks = [
             lambda: self._challenge(evidence),
+            lambda: self._stamp(evidence),
             lambda: self._timestamps(evidence),
             lambda: self._reuse(sub, history),
             lambda: self._scene(sub),
             lambda: self._ai_image(sub),
         ]
-        names = ["challenge", "server_timestamps", "reuse", "scene_consistency", "ai_image"]
+        names = ["challenge", "stamp", "server_timestamps", "reuse", "scene_consistency", "ai_image"]
         if self.config.use_metadata:
             checks.append(lambda: self._metadata(sub))
             names.append("file_metadata")
@@ -134,6 +141,13 @@ class AntiCheat:
             return Signal("challenge", None, None, "no challenge (offline benchmark row)")
         bad = [f"{r.reason} ({role})" for role, r in (("before", evidence.before), ("after", evidence.after)) if not r.ok]
         return Signal("challenge", bool(bad), None, "; ".join(bad) or "both captures matched their challenges")
+
+    def _stamp(self, evidence: ChallengeEvidence | None) -> Signal:
+        if evidence is None or evidence.before_stamp is None or evidence.after_stamp is None:
+            return Signal("stamp", None, None, "no stamp check (offline benchmark row)")
+        checks = (("before", evidence.before_stamp), ("after", evidence.after_stamp))
+        bad = [f"{role}: read {s.found or 'nothing'}, expected {s.expected}" for role, s in checks if not s.ok]
+        return Signal("stamp", bool(bad), None, "; ".join(bad) or "both photos carry their challenge code")
 
     def _timestamps(self, evidence: ChallengeEvidence | None) -> Signal:
         if evidence is None:

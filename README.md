@@ -74,6 +74,7 @@ Commit each `results/<run_id>/` folder, `docs/results_cp2.md` and `data/manifest
 Details and the signal table are in [docs/anticheat.md](docs/anticheat.md).
 
 - `backend/bord/challenge.py`: server-issued, single-use capture challenges (code plus angle prompt) and server-clock ordering of the before and after captures.
+- `backend/bord/stamp.py`: the challenge code as a cell strip the browser draws into each frame and the server reads back on upload.
 - `backend/bord/imaging.py`: Pillow-only fingerprints, a 64-bit dhash for reuse and a scene-similarity score for the before/after consistency check.
 - `backend/bord/detectors.py`: the optional pixel AI-image detector (Hugging Face model, `requirements-detector.txt`) and the file-metadata diagnostic.
 - `backend/bord/anticheat.py`: runs the signals as stage 4 of the real-time pipeline; `ManifestHistory` stands in for a user's submission log in the offline benchmark.

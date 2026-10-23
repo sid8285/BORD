@@ -143,6 +143,30 @@ def test_challenge_and_timestamp_signals(tmp_path):
 
     offline = ac.check(sub(before, after))
     assert offline.signal("challenge").flagged is None and offline.signal("server_timestamps").flagged is None
+    # No stamp evidence (offline rows, or the Checkpoint 3 branch's two-field evidence): not applicable.
+    assert offline.signal("stamp").flagged is None and good.signal("stamp").flagged is None
+
+
+def test_stamp_signal():
+    from bord.stamp import StampCheck
+
+    t = [100.0]
+    store = ChallengeStore(clock=lambda: t[0])
+    cb, ca = store.issue("u1", "before"), store.issue("u1", "after")
+    rb = store.redeem(cb.id, cb.code, "u1", "before")
+    t[0] += 20
+    ra = store.redeem(ca.id, ca.code, "u1", "after")
+    ac = AntiCheat(AntiCheatConfig(use_metadata=False))
+
+    def stamp_signal(after_found):
+        evidence = ChallengeEvidence(rb, ra, StampCheck(cb.code, cb.code), StampCheck(ca.code, after_found))
+        # Nothing to hash here, so pass no photos: only the evidence-based signals matter.
+        return ac._stamp(evidence)
+
+    assert stamp_signal(ca.code).flagged is False
+    old = stamp_signal("ABCDEF" if ca.code != "ABCDEF" else "BCDEFG")
+    assert old.flagged is True and "after: read" in old.detail
+    assert stamp_signal(None).flagged is True
 
 
 def test_a_check_that_cannot_run_fails_closed(tmp_path):

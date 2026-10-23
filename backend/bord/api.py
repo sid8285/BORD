@@ -43,6 +43,7 @@ from .dataset import Submission
 from .detectors import file_metadata
 from .qwen_verifier import QwenVerifier
 from .realtime import Budget, RealtimeVerifier
+from .stamp import StampCheck, check_stamp
 
 MAX_PHOTO_BYTES = 15 * 1024 * 1024
 ALLOWED_FORMATS = {"JPEG", "PNG"}
@@ -68,6 +69,7 @@ class Capture:
     role: str
     path: Path
     redemption: Redemption
+    stamp: StampCheck
 
 
 class AppState:
@@ -157,10 +159,13 @@ def create_app(verifier=None, upload_dir: Path | None = None, store: ChallengeSt
             suffix = ".jpg" if img.format == "JPEG" else ".png"
         final = path.with_suffix(suffix)
         path.rename(final)
+        # Read the code back out of the pixels. Done on upload, so it is off the verdict's
+        # critical path; the anti-cheating stage only compares the stored result.
+        stamp = check_stamp(final, code)
         with state.lock:
-            state.captures[capture_id] = Capture(capture_id, user_id, role, final, redemption)
+            state.captures[capture_id] = Capture(capture_id, user_id, role, final, redemption, stamp)
         return {"capture_id": capture_id, "challenge_ok": redemption.ok, "reason": redemption.reason,
-                "received_at": redemption.received_at}
+                "received_at": redemption.received_at, "stamp_ok": stamp.ok}
 
     @app.post("/api/submissions")
     def submit(req: SubmissionRequest) -> dict:
@@ -194,7 +199,8 @@ def create_app(verifier=None, upload_dir: Path | None = None, store: ChallengeSt
             before_captured_at=iso(before.redemption.received_at),
             after_captured_at=iso(after.redemption.received_at),
         )
-        result = state.run_pipeline(sub, history, ChallengeEvidence(before.redemption, after.redemption))
+        evidence = ChallengeEvidence(before.redemption, after.redemption, before.stamp, after.stamp)
+        result = state.run_pipeline(sub, history, evidence)
         with state.lock:
             state.history.setdefault(req.user_id, []).append(after.path)
         return {
