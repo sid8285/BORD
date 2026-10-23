@@ -31,7 +31,7 @@ The SDK timeout bounds each network phase, not total wall-clock time, so a slow 
 
 The verdict model runs on the same machine, through Ollama. That removes network round-trips and provider queueing from stage 5. What's left is compute time on known hardware, which the run records in `summary.json` under `run.host`.
 
-The first request after Ollama starts also loads the weights, which takes seconds and isn't representative of steady-state latency. The harness therefore makes one **untimed warm-up call** before a run and records its latency separately (`run.warmup`). In deployment, the server keeps the model loaded. A cold model counts as a failure mode, and a request that hits one ends as a hold.
+The first request after Ollama starts also loads the weights, which takes seconds and isn't representative of steady-state latency. The harness therefore makes one **untimed warm-up call** before a run, on a generated photo pair that is not in the manifest (so the first timed row is not a prompt-cache hit), and records its latency separately (`run.warmup`). In deployment, the server keeps the model loaded. A cold model counts as a failure mode, and a request that hits one ends as a hold.
 
 ## What the harness logs
 

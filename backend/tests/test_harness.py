@@ -128,3 +128,40 @@ def test_summary_untested_without_data():
     s = summarize([])
     assert s["assumptions"]["1"]["status"] == "untested"
     assert s["assumptions"]["2"]["status"] == "untested"
+
+
+def test_warmup_input_is_not_a_manifest_row(tmp_path):
+    from PIL import Image
+    from bord.evaluate import warmup_submission
+
+    sub = warmup_submission(tmp_path)
+    assert sub.pair_id == "warmup" and sub.before_path != sub.after_path
+    for p in (sub.before_path, sub.after_path):
+        assert p.parent == tmp_path
+        with Image.open(p) as img:
+            assert img.size == (1568, 1176)  # same image-token count as a preprocessed photo
+
+
+def test_cli_warms_up_on_its_own_input(tmp_path, monkeypatch):
+    import bord.evaluate as evaluate
+
+    calls = []
+
+    class Recording:
+        model = "m"
+
+        def verify(self, sub):  # the untimed warm-up
+            calls.append(("warmup", sub.pair_id))
+            return VerifierResult(sub.pair_id, "completed", 0.9, "", 1.0, model="m")
+
+        def prepare(self, sub):
+            return []
+
+        def call(self, sub, content, timeout_s):  # timed calls, through RealtimeVerifier
+            calls.append(("timed", sub.pair_id))
+            return VerifierResult(sub.pair_id, "completed", 0.9, "", 1.0, model="m")
+
+    monkeypatch.setattr(evaluate, "build_verifier", lambda args: (Recording(), {"model": "m"}))
+    manifest = _write_manifest(tmp_path, [HONEST])
+    assert evaluate.main(["--manifest", str(manifest), "--out", str(tmp_path / "out"), "--warmup"]) == 0
+    assert calls == [("warmup", "warmup"), ("timed", "p01")]

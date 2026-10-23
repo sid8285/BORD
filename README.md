@@ -65,7 +65,7 @@ DASHSCOPE_API_KEY=... python -m bord.evaluate --manifest ../data/manifest.csv --
 ANTHROPIC_API_KEY=... python -m bord.evaluate --manifest ../data/manifest.csv --out ../results --provider anthropic  # frontier comparison (Opus 5.5)
 ```
 
-For local providers the harness makes one untimed warm-up call first, so model loading is not counted as verdict latency, and it records the machine (`run.host`) in `summary.json`.
+For local providers the harness makes one untimed warm-up call first, on a generated photo pair that is not in the manifest, so neither model loading nor a prompt-cache hit on the first row is counted as verdict latency, and it records the machine (`run.host`) in `summary.json`.
 
 Commit each `results/<run_id>/` folder, `docs/results_cp2.md` and `data/manifest.csv`. They are the evidence for Assumptions 1 and 2 and the real-time budget.
 

@@ -121,4 +121,5 @@ def test_evaluate_cli_with_unreachable_local_server(tmp_path):
     assert run.name.endswith("_qwen3-vl-8b-instruct")  # ':' removed from the folder name
     summary = json.loads((run / "summary.json").read_text())
     assert summary["run"]["provider"] == "ollama" and summary["run"]["warmup"]["error"]
+    assert summary["run"]["warmup"]["input"] == "synthetic"
     assert summary["realtime"]["holds"] == 1 and "platform" in summary["run"]["host"]

@@ -27,10 +27,13 @@ import platform
 import re
 import subprocess
 import sys
+import tempfile
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable, Protocol
+
+from PIL import Image, ImageDraw
 
 from .anticheat import AntiCheat, AntiCheatConfig, ManifestHistory
 from .dataset import ADVERSARIAL_CATEGORIES, Submission, load_manifest
@@ -372,6 +375,33 @@ def run(
     return summary
 
 
+WARMUP_TASK = "Warm-up call, not part of the evaluation: put the grey square in the box."
+
+
+def warmup_submission(folder: Path) -> Submission:
+    """A before/after pair that is not in any manifest, for the untimed warm-up call.
+
+    Checkpoint 2 warmed up on manifest row 1 and then timed row 1 again, so its first
+    timed call hit the model server's prompt cache and came out unusually fast. These
+    photos are drawn here, are the size of a phone photo after preprocessing, and share
+    no image with the manifest, so no timed call can reuse the warm-up's cache.
+    """
+    paths = []
+    for name, square_xy in (("before", (200, 300)), ("after", (900, 500))):
+        img = Image.new("RGB", (1568, 1176), (196, 180, 150))
+        draw = ImageDraw.Draw(img)
+        draw.rectangle((820, 420, 1300, 900), outline=(40, 40, 40), width=12)  # the box
+        x, y = square_xy
+        draw.rectangle((x, y, x + 260, y + 260), fill=(120, 120, 120))  # the grey square
+        path = folder / f"warmup_{name}.jpg"
+        img.save(path, quality=90)
+        paths.append(path)
+    return Submission(pair_id="warmup", set="honest", task_type="single_scene",
+                      task_description=WARMUP_TASK, before_path=paths[0], after_path=paths[1],
+                      label="completed", adversarial_category=None, base_pair_id=None,
+                      capture_source="generated", before_captured_at="", after_captured_at="")
+
+
 def host_info() -> dict:
     """The machine the run used. Local-model latency is a property of this hardware."""
     info = {"platform": platform.platform(), "machine": platform.machine(),
@@ -467,9 +497,11 @@ def main(argv: list[str] | None = None) -> int:
     warmup_meta = None
     if warmup and submissions:
         # Untimed: the first request to a local server includes loading the weights,
-        # which is a cold-start cost, not steady-state verdict latency.
-        w = model_verifier.verify(submissions[0])
-        warmup_meta = {"latency_s": w.latency_s, "error": w.error}
+        # which is a cold-start cost, not steady-state verdict latency. It uses its own
+        # input so the first timed row is not served from the warm-up's prompt cache.
+        with tempfile.TemporaryDirectory() as tmp:
+            w = model_verifier.verify(warmup_submission(Path(tmp)))
+        warmup_meta = {"latency_s": w.latency_s, "error": w.error, "input": "synthetic"}
         print(f"warm-up: {w.latency_s:.2f}s ({w.error or 'ok'})", file=sys.stderr)
 
     started = datetime.now(timezone.utc)
