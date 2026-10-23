@@ -159,3 +159,31 @@ def test_calibration_covers_recaptured_photos():
     assert c["separable"] is True and c["suggested_reuse_max_distance"] == 12
     c = calibration(honest + recaptured + [rec("adversarial", "recaptured", {"reuse": False}, scores={"reuse": 18.0})])
     assert c["reuse_distance"]["separable"] is False
+
+
+def test_holdout_scores_thresholds_on_pairs_they_were_not_chosen_on():
+    from bord.anticheat_eval import holdout_check
+
+    def r(pair, base, set_, cat, scene, dist):
+        out = rec(set_, cat, {"scene_consistency": False, "reuse": False},
+                  scores={"scene_consistency": scene, "reuse": dist})
+        return {**out, "pair_id": pair, "base_pair_id": base}
+
+    records = [
+        # Checkpoint 2 pairs: honest scenes 0.6 and up, wrong scenes 0.3 and below.
+        r("p001", None, "honest", None, 0.6, 20.0), r("p002", None, "honest", None, 0.9, 25.0),
+        r("p001-wrong_scene", "p001", "adversarial", "wrong_scene", 0.3, 30.0),
+        r("p002-resubmitted-p001", "p002", "adversarial", "resubmitted", 0.7, 0.0),
+        # New pairs: one honest pair scores 0.42, under the chosen 0.45: a held-out false alarm.
+        r("p016", None, "honest", None, 0.42, 18.0), r("p017", None, "honest", None, 0.8, 22.0),
+        r("p016-wrong_scene", "p016", "adversarial", "wrong_scene", 0.5, 30.0),
+        r("p017-recaptured", "p017", "adversarial", "recaptured", 0.8, 12.0),
+    ]
+    h = holdout_check(records, "p015")
+    assert h["n_calibration"] == 4 and h["n_held_out"] == 4
+    assert h["thresholds"] == {"scene_min_score": pytest.approx(0.45), "reuse_max_distance": 0}
+    held = h["held_out"]
+    assert held["scene_consistency"]["honest_flagged"]["k"] == 1  # p016
+    assert held["scene_consistency"]["wrong_scene"]["k"] == 0  # 0.5 is above 0.45: missed
+    assert held["reuse"]["recaptured"]["k"] == 0  # 12 bits is far over the copies' 0
+    assert held["overall"]["honest_flagged"]["n"] == 2

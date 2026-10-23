@@ -27,9 +27,16 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .anticheat import ManifestHistory
-from .dataset import Submission, load_manifest
-from .evaluate import _assumption_4, add_anticheat_args, build_anticheat, host_info, summarize_anticheat
+from .anticheat import AntiCheatConfig, ManifestHistory
+from .dataset import ADVERSARIAL_CATEGORIES, Submission, load_manifest
+from .evaluate import (
+    _assumption_4,
+    _proportion,
+    add_anticheat_args,
+    build_anticheat,
+    host_info,
+    summarize_anticheat,
+)
 
 
 def _scores(records: list[dict], signal: str, category: str | None, honest: bool) -> list[float]:
@@ -88,6 +95,56 @@ def calibration(records: list[dict]) -> dict:
     }
 
 
+def holdout_check(records: list[dict], calibrate_through: str, defaults: AntiCheatConfig = AntiCheatConfig()) -> dict:
+    """Choose the scene and reuse thresholds on one part of the data and score them on the rest.
+
+    Rows whose pair (an attack: its base pair) sorts at or before ``calibrate_through`` are
+    the calibration set, for example the Checkpoint 2 pairs p001-p015; the rest are held out.
+    A threshold chosen and scored on the same rows looks better than it is, so the held-out
+    flag rates are the numbers to report. Where the calibration groups overlap, the default
+    threshold is kept.
+    """
+    def base(r: dict) -> str:
+        return r.get("base_pair_id") or r["pair_id"]
+
+    calib = [r for r in records if base(r) <= calibrate_through]
+    held = [r for r in records if base(r) > calibrate_through]
+    hints = calibration(calib)
+    scene_min = hints["scene_consistency"].get("suggested_scene_min", defaults.scene_min_score)
+    reuse_max = hints["reuse_distance"].get("suggested_reuse_max_distance", defaults.reuse_max_distance)
+
+    def score(r: dict, name: str) -> float | None:
+        s = next((s for s in r["anticheat"]["signals"] if s["name"] == name), None)
+        return None if s is None else s["score"]
+
+    def flags(r: dict) -> dict[str, bool]:
+        scene, dist = score(r, "scene_consistency"), score(r, "reuse")
+        out = {"scene_consistency": scene is not None and scene < scene_min,
+               "reuse": dist is not None and dist <= reuse_max}
+        others = any(s["flagged"] for s in r["anticheat"]["signals"]
+                     if not s["diagnostic"] and s["name"] not in ("scene_consistency", "reuse"))
+        out["overall"] = others or out["scene_consistency"] or out["reuse"]
+        return out
+
+    def rates(name: str) -> dict:
+        honest = [r for r in held if r["set"] == "honest"]
+        block = {"honest_flagged": _proportion(sum(flags(r)[name] for r in honest), len(honest))}
+        for cat in ADVERSARIAL_CATEGORIES:
+            rows = [r for r in held if r["adversarial_category"] == cat]
+            if rows:
+                block[cat] = _proportion(sum(flags(r)[name] for r in rows), len(rows))
+        return block
+
+    return {
+        "calibrate_through": calibrate_through,
+        "n_calibration": len(calib),
+        "n_held_out": len(held),
+        "thresholds": {"scene_min_score": scene_min, "reuse_max_distance": reuse_max},
+        "calibration": hints,
+        "held_out": {name: rates(name) for name in ("scene_consistency", "reuse", "overall")} if held else None,
+    }
+
+
 def record_for(sub: Submission, report) -> dict:
     return {
         "pair_id": sub.pair_id, "set": sub.set, "label": sub.label,
@@ -101,6 +158,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--manifest", required=True, type=Path)
     parser.add_argument("--out", default=Path("results"), type=Path)
     add_anticheat_args(parser)
+    parser.add_argument("--calibrate-through", metavar="PAIR_ID",
+                        help="also choose thresholds on the pairs up to this id (e.g. p015) and report "
+                             "flag rates on the later pairs only (holdout block in summary.json)")
     args = parser.parse_args(argv)
 
     submissions = load_manifest(args.manifest)
@@ -129,10 +189,11 @@ def main(argv: list[str] | None = None) -> int:
         "anticheat": stats,
         "assumption_4": _assumption_4(stats) if stats else None,
         "calibration": calibration(records),
+        "holdout": holdout_check(records, args.calibrate_through) if args.calibrate_through else None,
     }
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(json.dumps({"overall": stats["overall"]["by_category"], "honest_flagged": stats["overall"]["honest"],
-                      "calibration": summary["calibration"]}, indent=2))
+                      "calibration": summary["calibration"], "holdout": summary["holdout"]}, indent=2))
     print(f"wrote {out_dir}", file=sys.stderr)
     return 0
 
