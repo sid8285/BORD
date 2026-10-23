@@ -269,8 +269,16 @@ def summarize(records: list[dict], server_deadline_s: float = RT_SERVER_DEADLINE
     def llm_s(r: dict) -> float:
         return r.get("stages", {}).get("llm_s", r["latency_s"])
 
-    timed_out = [llm_s(r) for r in records if (r["error"] or "").startswith("timeout")]
-    a2_latencies = [math.inf if (r["error"] or "").startswith("timeout") else llm_s(r) for r in records]
+    def is_timeout(r: dict) -> bool:
+        return (r["error"] or "").startswith("timeout")
+
+    # Only calls the model actually answered (or that timed out) say how fast it is. A call
+    # rejected at once (bad API key, connection refused) would otherwise read as very fast.
+    def model_ran(r: dict) -> bool:
+        return r["verdict"] is not None or bool(r.get("output_tokens"))
+
+    timed_out = [llm_s(r) for r in records if is_timeout(r)]
+    a2_latencies = [math.inf if is_timeout(r) else llm_s(r) for r in records if is_timeout(r) or model_ran(r)]
     llm_p95 = percentile(a2_latencies, 95)
     timeout_floor = min(timed_out, default=None)
 

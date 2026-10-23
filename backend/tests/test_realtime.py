@@ -176,3 +176,16 @@ def test_assumption_1_status_matches_the_checkpoint_2_report():
     records += [_rec("adversarial", "not_completed", "completed", RELEASE, 9.0, "reused") for _ in range(2)]
     records += [_rec("adversarial", "not_completed", "not_completed", FORFEIT, 9.0, "reused") for _ in range(58)]
     assert summarize(records)["assumptions"]["1"]["status"] == "Broken"
+
+
+def test_calls_that_never_reached_the_model_do_not_count_as_fast():
+    # Two answered calls at 9 s, three rejected at once (e.g. a bad API key).
+    records = [_rec("honest", "completed", "completed", RELEASE, 9.0) for _ in range(2)]
+    for _ in range(3):
+        r = _rec("honest", "completed", None, HOLD, 0.05)
+        r["error"] = "AuthenticationError: invalid x-api-key"
+        records.append(r)
+    a2 = summarize(records)["assumptions"]["2"]
+    assert a2["p95_llm_latency_s"] == pytest.approx(8.9) and a2["latency_status"] == "Broken"
+    only_rejected = summarize(records[2:])["assumptions"]["2"]
+    assert only_rejected["latency_status"] == "Untested"
