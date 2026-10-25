@@ -1,16 +1,16 @@
-pair_id,task_type,task_description,label,scene_id
-p001,single_scene,Put my headphones on the charger,completed,desk
-p002,single_scene,Throw the tissue away,completed,desk
-p003,single_scene,Get rid of the Coke can,completed,desk
-p004,single_scene,Turn off the lamp,completed,desk
-p005,single_scene,Put the deodorant in the basket,completed,basket
-p006,single_scene,Take the stickers off the fridge,completed,fridge
-p007,single_scene,Get rid of the red light on the Alexa,completed,desk
-p008,single_scene,Throw away the receipt,completed,desk
-p009,single_scene,Take down the hats,completed,hats
-p010,single_scene,Turn off the monitor,completed,desk
-p011,single_scene,Organize the money,completed,desk
-p012,single_scene,Put the keychain in front of the keyboard,completed,desk
-p013,single_scene,Move the sticker,not_completed,fridge
-p014,single_scene,Close the laptop,not_completed,desk
-p015,single_scene,Throw away the Coke can,not_completed,desk
+pair_id,task_type,task_description,label,scene_id,task_id
+p001,single_scene,Put my headphones on the charger,completed,desk,
+p002,single_scene,Throw the tissue away,completed,desk,
+p003,single_scene,Get rid of the Coke can,completed,desk,
+p004,single_scene,Turn off the lamp,completed,desk,lamp
+p005,single_scene,Put the deodorant in the basket,completed,basket,
+p006,single_scene,Take the stickers off the fridge,completed,fridge,
+p007,single_scene,Get rid of the red light on the Alexa,completed,desk,
+p008,single_scene,Throw away the receipt,completed,desk,
+p009,single_scene,Take down the hats,completed,hats,
+p010,single_scene,Turn off the monitor,completed,desk,monitor
+p011,single_scene,Organize the money,completed,desk,
+p012,single_scene,Put the keychain in front of the keyboard,completed,desk,keychain
+p013,single_scene,Move the sticker,not_completed,fridge,
+p014,single_scene,Close the laptop,not_completed,desk,
+p015,single_scene,Throw away the Coke can,not_completed,desk,
