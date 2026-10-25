@@ -131,10 +131,39 @@ def _write_pairs(path: Path, pairs: dict[str, dict]) -> None:
         writer.writerows(pairs[pid] for pid in sorted(pairs))
 
 
-def ingest(data: Path, intake: Path, source: Path) -> list[str]:
+def capture_key(path: Path) -> tuple[str, float]:
+    """Sort key: EXIF capture time when the photo has one, then the file's modified time."""
+    taken = ""
+    try:
+        with Image.open(path) as img:
+            exif = img.getexif()
+            taken = str(exif.get_ifd(EXIF_IFD).get(36867) or exif.get(306) or "")
+    except OSError:
+        pass
+    return taken, path.stat().st_mtime
+
+
+def fill_in_order(rows: list[dict], source: Path) -> list[str]:
+    """Give rows with an empty ``file`` the photos in ``source`` that no row names, in the
+    order they were taken. For a shoot done in the intake list's order."""
+    named = {r["file"] for r in rows if r.get("file")}
+    photos = sorted((p for p in source.iterdir() if p.is_file() and p.name not in named
+                     and p.suffix.lower() in IMAGE_EXTS), key=capture_key)
+    blank = [r for r in rows if not r.get("file")]
+    if len(photos) != len(blank):
+        raise SystemExit(f"{len(blank)} intake rows have no file, but {source} has {len(photos)} unnamed photos")
+    for r, p in zip(blank, photos):
+        r["file"] = p.name
+    return [f"{r['file']} = {r['kind']} {r['pair_id']}" for r in blank]
+
+
+def ingest(data: Path, intake: Path, source: Path, in_order: bool = False) -> list[str]:
     """Place every photo in the intake list. Returns one line per photo for the log."""
     with intake.open(newline="", encoding="utf-8") as fh:
         rows = [{k: (v or "").strip() for k, v in r.items() if k} for r in csv.DictReader(fh)]
+    if in_order:
+        for line in fill_in_order(rows, source):
+            print(f"in order: {line}")
     for n, r in enumerate(rows, start=2):
         if r.get("kind") not in KINDS or not r.get("pair_id") or not r.get("file"):
             raise SystemExit(f"intake row {n}: need file, pair_id and kind (one of {', '.join(KINDS)})")
@@ -192,6 +221,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--intake", type=Path, help="CSV: file,kind,pair_id,task_description,label,scene_id,task_id,source_url")
     parser.add_argument("--source", type=Path, help="folder the intake's file names are relative to")
     parser.add_argument("--strip-only", action="store_true", help="only remove GPS from the JPEGs already in data/")
+    parser.add_argument("--in-order", action="store_true",
+                        help="fill empty file cells with the source folder's other photos, oldest first")
     args = parser.parse_args(argv)
 
     if args.strip_only:
@@ -200,7 +231,7 @@ def main(argv: list[str] | None = None) -> int:
     else:
         if not args.intake:
             parser.error("--intake is required unless --strip-only")
-        for line in ingest(args.data, args.intake, args.source or args.intake.parent):
+        for line in ingest(args.data, args.intake, args.source or args.intake.parent, args.in_order):
             print(line)
     left = [p for p in args.data.rglob("*") if p.suffix.lower() in IMAGE_EXTS and has_gps(p)]
     for p in left:

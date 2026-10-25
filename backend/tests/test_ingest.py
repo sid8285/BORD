@@ -101,3 +101,24 @@ def test_ingest_refuses_a_pair_without_its_label(tmp_path):
     (inbox / "intake.csv").write_text("file,kind,pair_id\n1,before,p020\n")
     with pytest.raises(SystemExit):
         ingest(data, inbox / "intake.csv", inbox)
+
+
+def test_in_order_matches_photos_to_rows_by_capture_time(tmp_path):
+    data, inbox = tmp_path / "data", tmp_path / "inbox"
+    data.mkdir()
+    phone_jpeg(inbox / "IMG_9.jpg", "2026:10:25 20:02:00", colour="blue")   # taken second
+    phone_jpeg(inbox / "IMG_1.jpg", "2026:10:25 20:01:00")                  # taken first
+    phone_jpeg(inbox / "clean.jpg", gps=False, colour="white")              # named in the list
+    (inbox / "intake.csv").write_text(
+        "file,kind,pair_id,task_description,label,scene_id,task_id,source_url\n"
+        ",before,p016,Shut the drawer,completed,kitchen,,\n"
+        ",after,p016,,,,,\n"
+        "clean.jpg,web,w01,,,,,https://example.com/x\n")
+    ingest(data, inbox / "intake.csv", inbox, in_order=True)
+    with Image.open(data / "pairs" / "p016" / "before.jpg") as img:
+        assert img.getpixel((0, 0))[0] > 200  # red: IMG_1, the first one taken
+    with Image.open(data / "pairs" / "p016" / "after.jpg") as img:
+        assert img.getpixel((0, 0))[2] > 200  # blue
+    (inbox / "intake.csv").write_text("file,kind,pair_id,task_description,label\n,before,p017,x,completed\n")
+    with pytest.raises(SystemExit):  # 1 blank row, 3 unnamed photos
+        ingest(data, inbox / "intake.csv", inbox, in_order=True)
