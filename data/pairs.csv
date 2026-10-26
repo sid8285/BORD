@@ -14,3 +14,14 @@ p012,single_scene,Put the keychain in front of the keyboard,completed,desk,keych
 p013,single_scene,Move the sticker,not_completed,fridge,
 p014,single_scene,Close the laptop,not_completed,desk,
 p015,single_scene,Throw away the Coke can,not_completed,desk,
+p016,single_scene,Put the dishes away,completed,kitchen,
+p017,single_scene,Put the shoes in the shoe rack,completed,bedroom,
+p018,single_scene,Fold the laundry on the bed,completed,bedroom,
+p019,single_scene,Clean the bathroom vanity,completed,bathroom,
+p020,single_scene,Put away the inflatable mattress,not_completed,living_room,
+p021,single_scene,Put the skateboards down,not_completed,living_room,
+p022,single_scene,Stack the pillows,not_completed,balcony,
+p023,single_scene,Organize the fridge,not_completed,kitchen,
+p024,single_scene,Turn off the lamp,completed,desk,lamp
+p025,single_scene,Turn off the monitor,completed,desk,monitor
+p026,single_scene,Put the keychain in front of the keyboard,completed,desk,keychain
