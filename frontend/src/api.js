@@ -44,10 +44,11 @@ export async function submitTask({ userId, taskDescription, beforeCaptureId, aft
   );
 }
 
-export async function postDeviceReport({ label, blob }) {
+export async function postDeviceReport({ label, blob, captureMs }) {
   const form = new FormData();
   form.append("user_agent", navigator.userAgent);
   form.append("label", label);
+  if (captureMs !== undefined) form.append("capture_ms", String(Math.round(captureMs)));
   form.append("photo", blob, "frame.jpg");
   return json(await fetch("/api/device-reports", { method: "POST", body: form }));
 }

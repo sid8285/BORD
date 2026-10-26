@@ -37,8 +37,14 @@ export default function DeviceTest() {
     setState("uploading");
     setError("");
     try {
-      const { blob } = await grabFrame(videoRef.current, null);
-      setReport(await postDeviceReport({ label, blob }));
+      // Time the in-browser capture stage the way the real capture page runs it: draw the
+      // frame, overlay a challenge code and its stamp strip, encode the JPEG (budget: under 1 s).
+      const t0 = performance.now();
+      const { blob } = await grabFrame(videoRef.current, { code: "TEST23" });
+      const captureMs = performance.now() - t0;
+      const t1 = performance.now();
+      const result = await postDeviceReport({ label, blob, captureMs });
+      setReport({ ...result, upload_ms: Math.round(performance.now() - t1) });
       setState("done");
     } catch (e) {
       setError(e.message);
@@ -63,7 +69,7 @@ export default function DeviceTest() {
       {report && (
         <pre>
           {JSON.stringify(
-            { format: report.format, size: report.size, exif_tag_count: report.exif_tag_count, carries_exif: report.carries_exif },
+            { format: report.format, size: report.size, exif_tag_count: report.exif_tag_count, carries_exif: report.carries_exif, capture_ms: report.capture_ms, upload_ms: report.upload_ms },
             null,
             2
           )}

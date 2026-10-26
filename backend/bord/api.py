@@ -221,6 +221,7 @@ def create_app(verifier=None, upload_dir: Path | None = None, store: ChallengeSt
     def device_report(
         user_agent: str = Form(...),
         label: str = Form(""),
+        capture_ms: float | None = Form(None),
         photo: UploadFile = File(...),
     ) -> dict:
         """Assumption 3 device test: does a frame captured with getUserMedia carry EXIF?
@@ -247,6 +248,7 @@ def create_app(verifier=None, upload_dir: Path | None = None, store: ChallengeSt
             "user_agent": user_agent[:300], "label": label[:100], "format": fmt, "size": size,
             "bytes": len(data), "exif_tag_count": exif_tags, **meta,
             "carries_exif": exif_tags > 0,
+            "capture_ms": capture_ms,
         }
         with state.lock, state.device_log.open("a", encoding="utf-8") as fh:
             fh.write(json.dumps(record) + "\n")

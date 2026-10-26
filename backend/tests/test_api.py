@@ -186,3 +186,11 @@ def test_device_report_inspects_the_bytes(tmp_path):
     logged = [json.loads(line) for line in (tmp_path / "devices.jsonl").read_text().splitlines()]
     assert logged[0]["user_agent"] == "TestPhone/1.0" and logged[0]["label"] == "test phone"
     assert list((tmp_path / "uploads").glob("probe-*")) == []  # the probe photo is deleted
+    assert logged[0]["capture_ms"] is None
+
+
+def test_device_report_logs_the_capture_time(tmp_path):
+    s = Session(tmp_path)
+    r = s.client.post("/api/device-reports", data={"user_agent": "TestPhone/1.0", "capture_ms": "42"},
+                      files={"photo": ("frame.jpg", jpeg_bytes(smooth_scene(8)), "image/jpeg")})
+    assert r.status_code == 200 and r.json()["capture_ms"] == 42.0
