@@ -28,9 +28,9 @@ echo "== 2. Anti-cheating signals without an LLM; thresholds chosen on p001-p015
 python -m bord.anticheat_eval --manifest "$DATA/manifest.csv" --out "$OUT" --calibrate-through p015
 
 echo "== 3. Claude verifier with the anti-cheating stage, under the real budget (6.5 s call, 8 s deadline)"
-python -m bord.evaluate --manifest "$DATA/manifest.csv" --out "$OUT" --provider anthropic --anticheat "${SMOKE[@]}"
+python -m bord.evaluate --manifest "$DATA/manifest.csv" --out "$OUT" --provider anthropic --anticheat ${SMOKE[@]+"${SMOKE[@]}"}
 
-if [[ ${#SMOKE[@]} -gt 0 ]]; then
+if [[ -n "${SMOKE[*]:-}" ]]; then
   echo "smoke run done; rerun without --smoke for the full evaluation"
   exit 0
 fi
