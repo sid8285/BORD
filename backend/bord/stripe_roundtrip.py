@@ -39,7 +39,11 @@ DAY_S = 24 * 3600
 def _intent_state(stripe, key: str, pid: str) -> dict:
     """What Stripe says about a PaymentIntent now, including the card's capture deadline."""
     intent = stripe.PaymentIntent.retrieve(pid, api_key=key, expand=["latest_charge"])
+    # stripe-python 8+ returns StripeObjects, which are not dicts; to_dict() converts nested ones too.
+    intent = intent.to_dict() if hasattr(intent, "to_dict") else dict(intent)
     charge = intent.get("latest_charge") or {}
+    if isinstance(charge, str):  # not expanded
+        charge = {"id": charge}
     card = ((charge.get("payment_method_details") or {}).get("card") or {}) if charge else {}
     return {
         "status": intent["status"],
