@@ -25,6 +25,23 @@ p023,honest,single_scene,Organize the fridge,pairs/p023/before.jpg,pairs/p023/af
 p024,honest,single_scene,Turn off the lamp,pairs/p024/before.jpg,pairs/p024/after.jpg,completed,,,phone,2026-10-25T21:32:50,2026-10-25T21:32:53
 p025,honest,single_scene,Turn off the monitor,pairs/p025/before.jpg,pairs/p025/after.jpg,completed,,,phone,2026-10-25T21:33:04,2026-10-25T21:33:10
 p026,honest,single_scene,Put the keychain in front of the keyboard,pairs/p026/before.jpg,pairs/p026/after.jpg,completed,,,phone,2026-10-25T21:33:18,2026-10-25T21:33:23
+p027,honest,single_scene,Tidy up the couch,pairs/p027/before.jpg,pairs/p027/after.jpg,completed,,,phone,2026-11-08T16:16:25,2026-11-08T16:16:52
+p028,honest,single_scene,Pick up clothes off of the floor,pairs/p028/before.jpg,pairs/p028/after.jpg,completed,,,phone,2026-11-08T16:18:31,2026-11-08T16:19:35
+p029,honest,single_scene,Make the bed,pairs/p029/before.jpg,pairs/p029/after.jpg,completed,,,phone,2026-11-08T16:19:51,2026-11-08T16:20:55
+p030,honest,single_scene,Clear off nightstand,pairs/p030/before.jpg,pairs/p030/after.jpg,completed,,,phone,2026-11-08T16:21:33,2026-11-08T16:22:17
+p031,honest,single_scene,Throw away toothpaste,pairs/p031/before.jpg,pairs/p031/after.jpg,completed,,,phone,2026-11-08T16:22:45,2026-11-08T16:23:05
+p032,honest,single_scene,Take food off of the couch,pairs/p032/before.jpg,pairs/p032/after.jpg,completed,,,phone,2026-11-08T16:23:57,2026-11-08T16:24:23
+p033,honest,single_scene,Take the steel bowl out of the fridge,pairs/p033/before.jpg,pairs/p033/after.jpg,completed,,,phone,2026-11-08T16:25:24,2026-11-08T16:26:18
+p034,honest,single_scene,Put away the plastic cups,pairs/p034/before.jpg,pairs/p034/after.jpg,completed,,,phone,2026-11-08T16:28:49,2026-11-08T16:29:06
+p035,honest,single_scene,Put away the golden spoons,pairs/p035/before.jpg,pairs/p035/after.jpg,completed,,,phone,2026-11-08T16:30:28,2026-11-08T16:30:46
+p036,honest,single_scene,Turn on the candle,pairs/p036/before.jpg,pairs/p036/after.jpg,completed,,,phone,2026-11-08T16:31:06,2026-11-08T16:31:32
+p037,honest,single_scene,Throw away the plastic cup,pairs/p037/before.jpg,pairs/p037/after.jpg,completed,,,phone,2026-11-08T16:32:02,2026-11-08T16:32:16
+p038,honest,single_scene,Organize papers into one pile,pairs/p038/before.jpg,pairs/p038/after.jpg,completed,,,phone,2026-11-08T16:33:00,2026-11-08T16:33:38
+p039,honest,single_scene,Tidy and open the piano,pairs/p039/before.jpg,pairs/p039/after.jpg,completed,,,phone,2026-11-08T16:34:14,2026-11-08T16:34:33
+p040,honest,single_scene,Hang dress with other clothes,pairs/p040/before.jpg,pairs/p040/after.jpg,completed,,,phone,2026-11-08T16:36:22,2026-11-08T16:36:56
+p041,honest,single_scene,Hide cable behind nightstand,pairs/p041/before.jpg,pairs/p041/after.jpg,completed,,,phone,2026-11-08T16:37:29,2026-11-08T16:37:52
+p042,honest,single_scene,Clean sink,pairs/p042/before.jpg,pairs/p042/after.jpg,completed,,,phone,2026-11-08T17:02:34,2026-11-08T17:03:40
+p043,honest,single_scene,Move cups away from sink,pairs/p043/before.jpg,pairs/p043/after.jpg,completed,,,phone,2026-11-08T17:04:36,2026-11-08T17:04:46
 p002-reused-p001,adversarial,single_scene,Throw the tissue away,pairs/p002/before.jpeg,pairs/p001/after.jpeg,not_completed,reused,p002,phone,,
 p003-reused-p002,adversarial,single_scene,Get rid of the Coke can,pairs/p003/before.jpeg,pairs/p002/after.jpeg,not_completed,reused,p003,phone,,
 p004-reused-p003,adversarial,single_scene,Turn off the lamp,pairs/p004/before.jpeg,pairs/p003/after.jpeg,not_completed,reused,p004,phone,,
@@ -41,6 +58,21 @@ p023-reused-p016,adversarial,single_scene,Organize the fridge,pairs/p023/before.
 p024-reused-p012,adversarial,single_scene,Turn off the lamp,pairs/p024/before.jpg,pairs/p012/after.jpeg,not_completed,reused,p024,phone,,
 p025-reused-p024,adversarial,single_scene,Turn off the monitor,pairs/p025/before.jpg,pairs/p024/after.jpg,not_completed,reused,p025,phone,,
 p026-reused-p025,adversarial,single_scene,Put the keychain in front of the keyboard,pairs/p026/before.jpg,pairs/p025/after.jpg,not_completed,reused,p026,phone,,
+p027-reused-p018,adversarial,single_scene,Tidy up the couch,pairs/p027/before.jpg,pairs/p018/after.jpg,not_completed,reused,p027,phone,,
+p028-reused-p027,adversarial,single_scene,Pick up clothes off of the floor,pairs/p028/before.jpg,pairs/p027/after.jpg,not_completed,reused,p028,phone,,
+p029-reused-p028,adversarial,single_scene,Make the bed,pairs/p029/before.jpg,pairs/p028/after.jpg,not_completed,reused,p029,phone,,
+p030-reused-p029,adversarial,single_scene,Clear off nightstand,pairs/p030/before.jpg,pairs/p029/after.jpg,not_completed,reused,p030,phone,,
+p031-reused-p019,adversarial,single_scene,Throw away toothpaste,pairs/p031/before.jpg,pairs/p019/after.jpg,not_completed,reused,p031,phone,,
+p033-reused-p016,adversarial,single_scene,Take the steel bowl out of the fridge,pairs/p033/before.jpg,pairs/p016/after.jpg,not_completed,reused,p033,phone,,
+p034-reused-p033,adversarial,single_scene,Put away the plastic cups,pairs/p034/before.jpg,pairs/p033/after.jpg,not_completed,reused,p034,phone,,
+p035-reused-p034,adversarial,single_scene,Put away the golden spoons,pairs/p035/before.jpg,pairs/p034/after.jpg,not_completed,reused,p035,phone,,
+p036-reused-p035,adversarial,single_scene,Turn on the candle,pairs/p036/before.jpg,pairs/p035/after.jpg,not_completed,reused,p036,phone,,
+p038-reused-p037,adversarial,single_scene,Organize papers into one pile,pairs/p038/before.jpg,pairs/p037/after.jpg,not_completed,reused,p038,phone,,
+p039-reused-p030,adversarial,single_scene,Tidy and open the piano,pairs/p039/before.jpg,pairs/p030/after.jpg,not_completed,reused,p039,phone,,
+p040-reused-p039,adversarial,single_scene,Hang dress with other clothes,pairs/p040/before.jpg,pairs/p039/after.jpg,not_completed,reused,p040,phone,,
+p041-reused-p040,adversarial,single_scene,Hide cable behind nightstand,pairs/p041/before.jpg,pairs/p040/after.jpg,not_completed,reused,p041,phone,,
+p042-reused-p031,adversarial,single_scene,Clean sink,pairs/p042/before.jpg,pairs/p031/after.jpg,not_completed,reused,p042,phone,,
+p043-reused-p036,adversarial,single_scene,Move cups away from sink,pairs/p043/before.jpg,pairs/p036/after.jpg,not_completed,reused,p043,phone,,
 p024-resubmitted-p004,adversarial,single_scene,Turn off the lamp,pairs/p024/before.jpg,pairs/p004/after.jpeg,not_completed,resubmitted,p024,phone,,
 p025-resubmitted-p010,adversarial,single_scene,Turn off the monitor,pairs/p025/before.jpg,pairs/p010/after.jpeg,not_completed,resubmitted,p025,phone,,
 p026-resubmitted-p012,adversarial,single_scene,Put the keychain in front of the keyboard,pairs/p026/before.jpg,pairs/p012/after.jpeg,not_completed,resubmitted,p026,phone,,
@@ -67,9 +99,26 @@ p020-wrong_scene,adversarial,single_scene,Put away the inflatable mattress,pairs
 p021-wrong_scene,adversarial,single_scene,Put the skateboards down,pairs/p021/before.jpg,pairs/p024/after.jpg,not_completed,wrong_scene,p021,phone,,
 p022-wrong_scene,adversarial,single_scene,Stack the pillows,pairs/p022/before.jpg,pairs/p024/after.jpg,not_completed,wrong_scene,p022,phone,,
 p023-wrong_scene,adversarial,single_scene,Organize the fridge,pairs/p023/before.jpg,pairs/p024/after.jpg,not_completed,wrong_scene,p023,phone,,
-p024-wrong_scene,adversarial,single_scene,Turn off the lamp,pairs/p024/before.jpg,pairs/p005/after.jpeg,not_completed,wrong_scene,p024,phone,,
-p025-wrong_scene,adversarial,single_scene,Turn off the monitor,pairs/p025/before.jpg,pairs/p005/after.jpeg,not_completed,wrong_scene,p025,phone,,
-p026-wrong_scene,adversarial,single_scene,Put the keychain in front of the keyboard,pairs/p026/before.jpg,pairs/p005/after.jpeg,not_completed,wrong_scene,p026,phone,,
+p024-wrong_scene,adversarial,single_scene,Turn off the lamp,pairs/p024/before.jpg,pairs/p027/after.jpg,not_completed,wrong_scene,p024,phone,,
+p025-wrong_scene,adversarial,single_scene,Turn off the monitor,pairs/p025/before.jpg,pairs/p027/after.jpg,not_completed,wrong_scene,p025,phone,,
+p026-wrong_scene,adversarial,single_scene,Put the keychain in front of the keyboard,pairs/p026/before.jpg,pairs/p027/after.jpg,not_completed,wrong_scene,p026,phone,,
+p027-wrong_scene,adversarial,single_scene,Tidy up the couch,pairs/p027/before.jpg,pairs/p031/after.jpg,not_completed,wrong_scene,p027,phone,,
+p028-wrong_scene,adversarial,single_scene,Pick up clothes off of the floor,pairs/p028/before.jpg,pairs/p031/after.jpg,not_completed,wrong_scene,p028,phone,,
+p029-wrong_scene,adversarial,single_scene,Make the bed,pairs/p029/before.jpg,pairs/p031/after.jpg,not_completed,wrong_scene,p029,phone,,
+p030-wrong_scene,adversarial,single_scene,Clear off nightstand,pairs/p030/before.jpg,pairs/p031/after.jpg,not_completed,wrong_scene,p030,phone,,
+p031-wrong_scene,adversarial,single_scene,Throw away toothpaste,pairs/p031/before.jpg,pairs/p032/after.jpg,not_completed,wrong_scene,p031,phone,,
+p032-wrong_scene,adversarial,single_scene,Take food off of the couch,pairs/p032/before.jpg,pairs/p033/after.jpg,not_completed,wrong_scene,p032,phone,,
+p033-wrong_scene,adversarial,single_scene,Take the steel bowl out of the fridge,pairs/p033/before.jpg,pairs/p037/after.jpg,not_completed,wrong_scene,p033,phone,,
+p034-wrong_scene,adversarial,single_scene,Put away the plastic cups,pairs/p034/before.jpg,pairs/p037/after.jpg,not_completed,wrong_scene,p034,phone,,
+p035-wrong_scene,adversarial,single_scene,Put away the golden spoons,pairs/p035/before.jpg,pairs/p037/after.jpg,not_completed,wrong_scene,p035,phone,,
+p036-wrong_scene,adversarial,single_scene,Turn on the candle,pairs/p036/before.jpg,pairs/p037/after.jpg,not_completed,wrong_scene,p036,phone,,
+p037-wrong_scene,adversarial,single_scene,Throw away the plastic cup,pairs/p037/before.jpg,pairs/p039/after.jpg,not_completed,wrong_scene,p037,phone,,
+p038-wrong_scene,adversarial,single_scene,Organize papers into one pile,pairs/p038/before.jpg,pairs/p039/after.jpg,not_completed,wrong_scene,p038,phone,,
+p039-wrong_scene,adversarial,single_scene,Tidy and open the piano,pairs/p039/before.jpg,pairs/p042/after.jpg,not_completed,wrong_scene,p039,phone,,
+p040-wrong_scene,adversarial,single_scene,Hang dress with other clothes,pairs/p040/before.jpg,pairs/p042/after.jpg,not_completed,wrong_scene,p040,phone,,
+p041-wrong_scene,adversarial,single_scene,Hide cable behind nightstand,pairs/p041/before.jpg,pairs/p042/after.jpg,not_completed,wrong_scene,p041,phone,,
+p042-wrong_scene,adversarial,single_scene,Clean sink,pairs/p042/before.jpg,pairs/p043/after.jpg,not_completed,wrong_scene,p042,phone,,
+p043-wrong_scene,adversarial,single_scene,Move cups away from sink,pairs/p043/before.jpg,pairs/p001/after.jpeg,not_completed,wrong_scene,p043,phone,,
 p001-web-w01,adversarial,single_scene,Put my headphones on the charger,pairs/p001/before.jpeg,web/w01.jpg,not_completed,web_sourced,p001,web,,
 p002-web-w02,adversarial,single_scene,Throw the tissue away,pairs/p002/before.jpeg,web/w02.jpg,not_completed,web_sourced,p002,web,,
 p003-web-w03,adversarial,single_scene,Get rid of the Coke can,pairs/p003/before.jpeg,web/w03.jpg,not_completed,web_sourced,p003,web,,
@@ -96,6 +145,23 @@ p023-web-w02,adversarial,single_scene,Organize the fridge,pairs/p023/before.jpg,
 p024-web-w03,adversarial,single_scene,Turn off the lamp,pairs/p024/before.jpg,web/w03.jpg,not_completed,web_sourced,p024,web,,
 p025-web-w01,adversarial,single_scene,Turn off the monitor,pairs/p025/before.jpg,web/w01.jpg,not_completed,web_sourced,p025,web,,
 p026-web-w02,adversarial,single_scene,Put the keychain in front of the keyboard,pairs/p026/before.jpg,web/w02.jpg,not_completed,web_sourced,p026,web,,
+p027-web-w03,adversarial,single_scene,Tidy up the couch,pairs/p027/before.jpg,web/w03.jpg,not_completed,web_sourced,p027,web,,
+p028-web-w01,adversarial,single_scene,Pick up clothes off of the floor,pairs/p028/before.jpg,web/w01.jpg,not_completed,web_sourced,p028,web,,
+p029-web-w02,adversarial,single_scene,Make the bed,pairs/p029/before.jpg,web/w02.jpg,not_completed,web_sourced,p029,web,,
+p030-web-w03,adversarial,single_scene,Clear off nightstand,pairs/p030/before.jpg,web/w03.jpg,not_completed,web_sourced,p030,web,,
+p031-web-w01,adversarial,single_scene,Throw away toothpaste,pairs/p031/before.jpg,web/w01.jpg,not_completed,web_sourced,p031,web,,
+p032-web-w02,adversarial,single_scene,Take food off of the couch,pairs/p032/before.jpg,web/w02.jpg,not_completed,web_sourced,p032,web,,
+p033-web-w03,adversarial,single_scene,Take the steel bowl out of the fridge,pairs/p033/before.jpg,web/w03.jpg,not_completed,web_sourced,p033,web,,
+p034-web-w01,adversarial,single_scene,Put away the plastic cups,pairs/p034/before.jpg,web/w01.jpg,not_completed,web_sourced,p034,web,,
+p035-web-w02,adversarial,single_scene,Put away the golden spoons,pairs/p035/before.jpg,web/w02.jpg,not_completed,web_sourced,p035,web,,
+p036-web-w03,adversarial,single_scene,Turn on the candle,pairs/p036/before.jpg,web/w03.jpg,not_completed,web_sourced,p036,web,,
+p037-web-w01,adversarial,single_scene,Throw away the plastic cup,pairs/p037/before.jpg,web/w01.jpg,not_completed,web_sourced,p037,web,,
+p038-web-w02,adversarial,single_scene,Organize papers into one pile,pairs/p038/before.jpg,web/w02.jpg,not_completed,web_sourced,p038,web,,
+p039-web-w03,adversarial,single_scene,Tidy and open the piano,pairs/p039/before.jpg,web/w03.jpg,not_completed,web_sourced,p039,web,,
+p040-web-w01,adversarial,single_scene,Hang dress with other clothes,pairs/p040/before.jpg,web/w01.jpg,not_completed,web_sourced,p040,web,,
+p041-web-w02,adversarial,single_scene,Hide cable behind nightstand,pairs/p041/before.jpg,web/w02.jpg,not_completed,web_sourced,p041,web,,
+p042-web-w03,adversarial,single_scene,Clean sink,pairs/p042/before.jpg,web/w03.jpg,not_completed,web_sourced,p042,web,,
+p043-web-w01,adversarial,single_scene,Move cups away from sink,pairs/p043/before.jpg,web/w01.jpg,not_completed,web_sourced,p043,web,,
 p001-ai_edited,adversarial,single_scene,Put my headphones on the charger,pairs/p001/before.jpeg,adversarial/p001-ai_edited.jpeg,not_completed,ai_edited,p001,generated,,
 p003-ai_edited,adversarial,single_scene,Get rid of the Coke can,pairs/p003/before.jpeg,adversarial/p003-ai_edited.jpeg,not_completed,ai_edited,p003,generated,,
 p005-ai_edited,adversarial,single_scene,Put the deodorant in the basket,pairs/p005/before.jpeg,adversarial/p005-ai_edited.jpeg,not_completed,ai_edited,p005,generated,,
@@ -107,3 +173,20 @@ p019-staged_partial,adversarial,single_scene,Clean the bathroom vanity,pairs/p01
 p024-recaptured,adversarial,single_scene,Turn off the lamp,pairs/p024/before.jpg,adversarial/p024-recaptured.jpg,not_completed,recaptured,p024,phone,,
 p025-recaptured,adversarial,single_scene,Turn off the monitor,pairs/p025/before.jpg,adversarial/p025-recaptured.jpg,not_completed,recaptured,p025,phone,,
 p026-recaptured,adversarial,single_scene,Put the keychain in front of the keyboard,pairs/p026/before.jpg,adversarial/p026-recaptured.jpg,not_completed,recaptured,p026,phone,,
+p027-staged_partial,adversarial,single_scene,Tidy up the couch,pairs/p027/before.jpg,adversarial/p027-staged_partial.jpg,not_completed,staged_partial,p027,phone,,
+p028-staged_partial,adversarial,single_scene,Pick up clothes off of the floor,pairs/p028/before.jpg,adversarial/p028-staged_partial.jpg,not_completed,staged_partial,p028,phone,,
+p029-staged_partial,adversarial,single_scene,Make the bed,pairs/p029/before.jpg,adversarial/p029-staged_partial.jpg,not_completed,staged_partial,p029,phone,,
+p030-staged_partial,adversarial,single_scene,Clear off nightstand,pairs/p030/before.jpg,adversarial/p030-staged_partial.jpg,not_completed,staged_partial,p030,phone,,
+p031-staged_partial,adversarial,single_scene,Throw away toothpaste,pairs/p031/before.jpg,adversarial/p031-staged_partial.jpg,not_completed,staged_partial,p031,phone,,
+p032-staged_partial,adversarial,single_scene,Take food off of the couch,pairs/p032/before.jpg,adversarial/p032-staged_partial.jpg,not_completed,staged_partial,p032,phone,,
+p033-staged_partial,adversarial,single_scene,Take the steel bowl out of the fridge,pairs/p033/before.jpg,adversarial/p033-staged_partial.jpg,not_completed,staged_partial,p033,phone,,
+p034-staged_partial,adversarial,single_scene,Put away the plastic cups,pairs/p034/before.jpg,adversarial/p034-staged_partial.jpg,not_completed,staged_partial,p034,phone,,
+p035-staged_partial,adversarial,single_scene,Put away the golden spoons,pairs/p035/before.jpg,adversarial/p035-staged_partial.jpg,not_completed,staged_partial,p035,phone,,
+p036-staged_partial,adversarial,single_scene,Turn on the candle,pairs/p036/before.jpg,adversarial/p036-staged_partial.jpg,not_completed,staged_partial,p036,phone,,
+p037-staged_partial,adversarial,single_scene,Throw away the plastic cup,pairs/p037/before.jpg,adversarial/p037-staged_partial.jpg,not_completed,staged_partial,p037,phone,,
+p038-staged_partial,adversarial,single_scene,Organize papers into one pile,pairs/p038/before.jpg,adversarial/p038-staged_partial.jpg,not_completed,staged_partial,p038,phone,,
+p039-staged_partial,adversarial,single_scene,Tidy and open the piano,pairs/p039/before.jpg,adversarial/p039-staged_partial.jpg,not_completed,staged_partial,p039,phone,,
+p040-staged_partial,adversarial,single_scene,Hang dress with other clothes,pairs/p040/before.jpg,adversarial/p040-staged_partial.jpg,not_completed,staged_partial,p040,phone,,
+p041-staged_partial,adversarial,single_scene,Hide cable behind nightstand,pairs/p041/before.jpg,adversarial/p041-staged_partial.jpg,not_completed,staged_partial,p041,phone,,
+p042-staged_partial,adversarial,single_scene,Clean sink,pairs/p042/before.jpg,adversarial/p042-staged_partial.jpg,not_completed,staged_partial,p042,phone,,
+p043-staged_partial,adversarial,single_scene,Move cups away from sink,pairs/p043/before.jpg,adversarial/p043-staged_partial.jpg,not_completed,staged_partial,p043,phone,,
