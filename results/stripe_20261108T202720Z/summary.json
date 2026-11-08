@@ -1,0 +1,32 @@
+{
+  "run_at": "2026-11-08T20:27:20.109201+00:00",
+  "mode": "stripe_test",
+  "livemode_seen": false,
+  "hold_ids": [
+    "pi_3UZcgODiuSUCLb4S3XsCVxII",
+    "pi_3UZcgPDiuSUCLb4S2q7wpbcH"
+  ],
+  "statuses": {
+    "authorize": "requires_capture",
+    "release (cancel)": "canceled",
+    "forfeit (capture)": "succeeded",
+    "capture after cancel (must fail)": "canceled"
+  },
+  "release_path_ok": true,
+  "forfeit_path_ok": true,
+  "double_settle_refused": true,
+  "capture_window_days": [
+    7.0,
+    7.0
+  ],
+  "assumption_5": {
+    "threshold_days": 7.0,
+    "status": "Holding"
+  },
+  "stripe_call_s": {
+    "max": 1.1298,
+    "mean": 0.6717,
+    "budget_s": 0.5,
+    "over_budget": 3
+  }
+}

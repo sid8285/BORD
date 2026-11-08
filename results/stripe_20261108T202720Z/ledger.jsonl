@@ -1,0 +1,5 @@
+{"at": 1794169641.3380253, "event": "authorized", "hold_id": "pi_3UZcgODiuSUCLb4S3XsCVxII", "task_id": "rt-20261108T202720Z-release", "amount_cents": 500}
+{"at": 1794169641.8463175, "event": "released", "hold_id": "pi_3UZcgODiuSUCLb4S3XsCVxII", "task_id": "rt-20261108T202720Z-release", "amount_cents": 500}
+{"at": 1794169643.078372, "event": "authorized", "hold_id": "pi_3UZcgPDiuSUCLb4S2q7wpbcH", "task_id": "rt-20261108T202720Z-forfeit", "amount_cents": 500}
+{"at": 1794169644.0290613, "event": "captured", "hold_id": "pi_3UZcgPDiuSUCLb4S2q7wpbcH", "task_id": "rt-20261108T202720Z-forfeit", "amount_cents": 500}
+{"at": 1794169644.0330746, "event": "charity_payout", "hold_id": "pi_3UZcgPDiuSUCLb4S2q7wpbcH", "task_id": "rt-20261108T202720Z-forfeit", "amount_cents": 500, "charity": "Simulated charity (test mode, no transfer)", "simulated": true}
