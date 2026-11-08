@@ -1,0 +1,12 @@
+{
+  "checked_at": "2026-11-08T01:05:46.454929+00:00",
+  "files": 66,
+  "by_folder": {
+    "adversarial": 11,
+    "pairs": 52,
+    "web": 3
+  },
+  "with_gps": [],
+  "camera_exif_kept": 60,
+  "all_gps_free": true
+}
