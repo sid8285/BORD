@@ -1,0 +1,131 @@
+{
+  "run": {
+    "started_at": "2026-11-08T20:22:41.776898+00:00",
+    "manifests": [
+      "../data/manifest.csv",
+      "../data/manifest_staged.csv"
+    ],
+    "config": {
+      "change_min": 22.0,
+      "max_clutter_ratio": 0.9,
+      "max_busy_unchanged": 0.5,
+      "max_reframe": 0.2
+    },
+    "host": {
+      "platform": "Windows-11-10.0.26300-SP0",
+      "machine": "AMD64",
+      "python": "3.12.10"
+    }
+  },
+  "honest_completed_flagged": {
+    "k": 11,
+    "n": 19,
+    "rate": 0.5789473684210527,
+    "ci95": [
+      0.36275551465160105,
+      0.7685837960796962
+    ]
+  },
+  "staged_partial_caught": {
+    "k": 1,
+    "n": 3,
+    "rate": 0.3333333333333333,
+    "ci95": [
+      0.0614903152761605,
+      0.7923450448735121
+    ]
+  },
+  "stage_s": {
+    "p50": 0.12479139992501587,
+    "p95": 0.14660630002617836,
+    "max": 0.15905410004779696
+  },
+  "features": {
+    "changed_frac": {
+      "honest": [
+        0.0625,
+        1.0
+      ],
+      "staged_partial": [
+        0.375,
+        0.875
+      ],
+      "separation": {
+        "threshold": 0.375,
+        "direction": "<=",
+        "caught": 1,
+        "n_staged": 3,
+        "false_holds": 1,
+        "n_honest": 19,
+        "score": 0.2807017543859649
+      }
+    },
+    "busy_unchanged_frac": {
+      "honest": [
+        0.0,
+        0.875
+      ],
+      "staged_partial": [
+        0.0,
+        0.375
+      ],
+      "separation": {
+        "threshold": 0.125,
+        "direction": ">=",
+        "caught": 2,
+        "n_staged": 3,
+        "false_holds": 9,
+        "n_honest": 19,
+        "score": 0.19298245614035087
+      }
+    },
+    "clutter_ratio": {
+      "honest": [
+        0.337524918235441,
+        1.0275742524750826
+      ],
+      "staged_partial": [
+        0.741213667492706,
+        0.9902661222264738
+      ],
+      "separation": {
+        "threshold": 0.741213667492706,
+        "direction": ">=",
+        "caught": 3,
+        "n_staged": 3,
+        "false_holds": 12,
+        "n_honest": 19,
+        "score": 0.368421052631579
+      }
+    },
+    "reframe": {
+      "honest": [
+        0.041666666666666664,
+        0.41999999999999993
+      ],
+      "staged_partial": [
+        0.08000000000000007,
+        0.24666666666666673
+      ],
+      "separation": {
+        "threshold": 0.125,
+        "direction": "<=",
+        "caught": 2,
+        "n_staged": 3,
+        "false_holds": 5,
+        "n_honest": 19,
+        "score": 0.40350877192982454
+      }
+    }
+  },
+  "assumption_7_pixel_rule": {
+    "targets": {
+      "min_catch": 0.5,
+      "max_false_hold": 0.1,
+      "min_attacks": 20
+    },
+    "enough_attacks": false,
+    "meets_catch": false,
+    "meets_false_hold": false
+  }
+}

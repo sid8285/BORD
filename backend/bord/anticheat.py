@@ -20,6 +20,9 @@ ai_image           does a pixel classifier think the AFTER photo is    AI-edited
                    AI-made? (weak, Assumption 4; needs a detector)
 file_metadata      does the file carry camera EXIF? (diagnostic only:  AI exports in
                    browser frames never do)                            the benchmark
+regions            region by region, was the clutter in the BEFORE     staged-partial
+                   photo cleared, or left in place / framed out?       (CP4, diagnostic
+                   (bord.regions; diagnostic until calibrated)         until calibrated)
 =================  ==================================================  ============
 
 A signal is ``flagged`` True / False, or None when it does not apply (no
@@ -40,7 +43,11 @@ from .challenge import Redemption, check_order
 from .dataset import Submission
 from .detectors import ImageDetector, file_metadata, looks_camera_made
 from .imaging import file_dhash, hamming, load_thumb, scene_similarity
+from .regions import region_report
 from .stamp import StampCheck
+
+
+DIAGNOSTIC_ONLY = ("file_metadata",)
 
 
 @dataclass(frozen=True)
@@ -55,6 +62,11 @@ class AntiCheatConfig:
     min_gap_s: float = 2.0
     max_gap_s: float = 3600.0
     use_metadata: bool = True  # report the diagnostic file_metadata signal
+    # Checkpoint 4: the per-region staged-partial check (bord.regions). Reported as a
+    # diagnostic until bord.region_eval shows a threshold that separates staged-partial
+    # attacks from honest pairs (Assumption 7); set regions_flag to let it hold a release.
+    use_regions: bool = True
+    regions_flag: bool = False
 
 
 @dataclass(frozen=True)
@@ -123,6 +135,9 @@ class AntiCheat:
         if self.config.use_metadata:
             checks.append(lambda: self._metadata(sub))
             names.append("file_metadata")
+        if self.config.use_regions:
+            checks.append(lambda: self._regions(sub))
+            names.append("regions")
 
         signals = []
         for name, check in zip(names, checks):
@@ -131,7 +146,8 @@ class AntiCheat:
             except (OSError, ValueError, RuntimeError) as e:
                 # Fail closed: a check that cannot run must not let a release through.
                 signals.append(Signal(name, True, None, f"check failed: {type(e).__name__}: {e}",
-                                      diagnostic=(name == "file_metadata")))
+                                      diagnostic=(name in DIAGNOSTIC_ONLY
+                                                  or (name == "regions" and not self.config.regions_flag))))
         return AntiCheatReport(signals, time.perf_counter() - t0)
 
     # --- signals -----------------------------------------------------------------
@@ -185,6 +201,12 @@ class AntiCheat:
         made = looks_camera_made(meta)
         fields = ", ".join(f"{k}={'yes' if v else 'no'}" for k, v in meta.items())
         return Signal("file_metadata", not made, None, fields, diagnostic=True)
+
+
+    def _regions(self, sub: Submission) -> Signal:
+        rep = region_report(sub.before_path, sub.after_path)
+        return Signal("regions", rep.flagged, rep.busy_unchanged_frac, rep.summary(),
+                      diagnostic=not self.config.regions_flag)
 
 
 class ManifestHistory:
