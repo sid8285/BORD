@@ -460,8 +460,10 @@ def build_verifier(args) -> tuple[object, dict]:
     """The verdict model for --provider, plus what the run metadata should record."""
     if args.provider == "anthropic":
         model = args.model or DEFAULT_MODEL
-        v = LLMOnlyVerifier(model=model, effort=args.effort, timeout_s=args.llm_timeout)
-        return v, {"provider": "anthropic", "model": model, "effort": args.effort}
+        v = LLMOnlyVerifier(model=model, effort=args.effort, timeout_s=args.llm_timeout, prompt=getattr(args, "prompt", "default"))
+        return v, {"provider": "anthropic", "model": model, "effort": args.effort, "prompt": getattr(args, "prompt", "default")}
+    if getattr(args, "prompt", "default") != "default":
+        raise SystemExit("--prompt regions is only implemented for --provider anthropic")
     v = QwenVerifier(provider=args.provider, model=args.model, base_url=args.base_url,
                      timeout_s=args.llm_timeout, json_mode=args.json_mode,
                      max_image_side=args.max_image_side)
@@ -508,6 +510,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--effort", default=DEFAULT_EFFORT,
                         choices=["low", "medium", "high", "xhigh", "max"],
                         help="anthropic provider only")
+    parser.add_argument("--prompt", choices=["default", "regions"], default="default",
+                        help="anthropic provider only: 'regions' is the Checkpoint 4 per-region prompt "
+                             "for staged-partial attacks (labelled 3x3 grid on both photos)")
     parser.add_argument("--warmup", action=argparse.BooleanOptionalAction, default=None,
                         help="one untimed call before the run so model loading is not measured "
                              "(default: on for local providers)")
@@ -549,7 +554,8 @@ def main(argv: list[str] | None = None) -> int:
     anticheat, anticheat_meta = build_anticheat(args) if args.anticheat else (None, None)
     run_id = (started.strftime("%Y%m%dT%H%M%SZ") + f"_{safe_model}"
               + (f"_{args.max_image_side}px" if model_meta.get("max_image_side", MAX_IMAGE_SIDE) != MAX_IMAGE_SIDE else "")
-              + ("_anticheat" if anticheat else ""))
+              + ("_anticheat" if anticheat else "")
+              + ("_regions" if args.prompt != "default" else ""))
     out_dir = args.out / run_id
     meta = {
         "run_id": run_id,
