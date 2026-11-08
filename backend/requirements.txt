@@ -7,3 +7,4 @@ uvicorn>=0.30,<1
 python-multipart>=0.0.9,<1
 httpx>=0.27,<1  # FastAPI TestClient, used by tests/test_api.py
 pillow-heif>=0.18,<2  # HEIC photos from an iPhone, bord.ingest
+stripe>=8  # test-mode manual-capture holds, bord.payments (imported lazily; only with STRIPE_SECRET_KEY)

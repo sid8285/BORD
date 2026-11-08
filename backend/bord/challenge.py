@@ -28,7 +28,7 @@ from dataclasses import asdict, dataclass
 # No 0/O, 1/I/L: the code is read off a screen and drawn on a photo.
 CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
 ANGLES = ("straight on", "from the left", "from the right", "from slightly above", "from a low angle")
-ROLES = ("before", "after")
+ROLES = ("before", "after", "checkin")  # checkin: a mid-session photo of a time-spread task (Checkpoint 4)
 
 
 @dataclass(frozen=True)
@@ -72,7 +72,8 @@ class ChallengeStore:
         self._max_used = max_used
         self._lock = threading.Lock()
 
-    def issue(self, user_id: str, role: str) -> Challenge:
+    def issue(self, user_id: str, role: str, angle: str | None = None) -> Challenge:
+        """``angle`` fixes the prompt (a multi-view task assigns one per view); otherwise random."""
         if role not in ROLES:
             raise ValueError(f"role must be one of {ROLES}, got {role!r}")
         now = self.clock()
@@ -81,7 +82,7 @@ class ChallengeStore:
             user_id=user_id,
             role=role,
             code="".join(secrets.choice(CODE_ALPHABET) for _ in range(self.code_length)),
-            angle=secrets.choice(ANGLES),
+            angle=angle or secrets.choice(ANGLES),
             issued_at=now,
             expires_at=now + self.ttl_s,
         )

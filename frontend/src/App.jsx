@@ -1,7 +1,7 @@
 import { useState } from "react";
 import CameraCapture from "./CameraCapture.jsx";
 import DeviceTest from "./DeviceTest.jsx";
-import { submitTask } from "./api.js";
+import { createTask, submitTaskWithWager } from "./api.js";
 
 const USER_KEY = "bord-user-id";
 
@@ -27,6 +27,9 @@ function localUserId() {
 export default function App() {
   const [userId] = useState(localUserId);
   const [task, setTask] = useState("");
+  const [wager, setWager] = useState("5.00"); // dollars, Stripe test mode: no real money moves
+  const [hours, setHours] = useState("1");    // deadline, hours from now (server clock decides)
+  const [taskId, setTaskId] = useState(null);
   const [step, setStep] = useState("task"); // task -> before -> after -> verifying -> result
   const [beforeId, setBeforeId] = useState(null);
   const [result, setResult] = useState(null);
@@ -39,7 +42,12 @@ export default function App() {
     setError("");
     try {
       setResult(
-        await submitTask({ userId, taskDescription: task, beforeCaptureId: beforeId, afterCaptureId: afterId })
+        await submitTaskWithWager({
+          taskId,
+          userId,
+          beforeCaptureIds: [beforeId],
+          afterCaptureIds: [afterId],
+        })
       );
       setStep("result");
     } catch (e) {
@@ -57,8 +65,36 @@ export default function App() {
             What will you do?
             <input value={task} onChange={(e) => setTask(e.target.value)} placeholder="Put the dishes away" />
           </label>
-          <button disabled={!task.trim()} onClick={() => setStep("before")}>
-            Take the before photo
+          <label>
+            Wager (USD, test mode)
+            <input value={wager} onChange={(e) => setWager(e.target.value)} inputMode="decimal" />
+          </label>
+          <label>
+            Deadline (hours from now, up to 168)
+            <input value={hours} onChange={(e) => setHours(e.target.value)} inputMode="decimal" />
+          </label>
+          {error && <p className="error">{error}</p>}
+          <button
+            disabled={!task.trim() || !(parseFloat(wager) >= 0.5) || !(parseFloat(hours) > 0)}
+            onClick={async () => {
+              setError("");
+              try {
+                // The server places the Stripe hold before the first photo is taken.
+                const created = await createTask({
+                  userId,
+                  description: task,
+                  taskType: "single_scene",
+                  wagerCents: Math.round(parseFloat(wager) * 100),
+                  deadlineS: parseFloat(hours) * 3600,
+                });
+                setTaskId(created.task.id);
+                setStep("before");
+              } catch (e) {
+                setError(e.message);
+              }
+            }}
+          >
+            Hold the wager and take the before photo
           </button>
         </section>
       )}
@@ -91,15 +127,19 @@ export default function App() {
                 {result.decision === "hold" && "On hold: a person will review your photos."}
               </h2>
               <p>{result.reason}</p>
-              {result.flagged_by.length > 0 && <p>Flagged by: {result.flagged_by.join(", ")}</p>}
+              {result.pairs.some((p) => p.flagged_by.length > 0) && (
+                <p>Flagged by: {[...new Set(result.pairs.flatMap((p) => p.flagged_by))].join(", ")}</p>
+              )}
               <p>
-                Server time {result.server_s.toFixed(1)}s{result.deadline_missed ? " (missed the deadline)" : ""}.
+                Server time {result.server_s.toFixed(1)}s
+                {result.pairs.some((p) => p.deadline_missed) ? " (missed the deadline)" : ""}.
               </p>
             </>
           )}
           <button
             onClick={() => {
               setTask("");
+              setTaskId(null);
               setResult(null);
               setBeforeId(null);
               setStep("task");
