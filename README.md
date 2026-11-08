@@ -16,6 +16,7 @@ CS 4220/6235 Real Time Embedded Systems, Fall 2026, Group 34 (solo).
 Checkpoint 1: planning only (submitted at `5f4de2bf`).
 Checkpoint 2: LLM-only baseline verifier, evaluation harness, real-time deadline handling and the first evaluation runs.
 Checkpoint 3: anti-cheating layer, camera-only capture flow and the latency re-measurement tooling (see below).
+Checkpoint 4: tasks with a wager held through Stripe test mode, multi-view and time-spread task types, and the measurements the Checkpoint 3 feedback asked for (see below).
 
 ## Docs
 
@@ -25,6 +26,7 @@ Checkpoint 3: anti-cheating layer, camera-only capture flow and the latency re-m
 - [Real-time budget](docs/realtime_budget.md)
 - [Collecting pairs](docs/collecting_pairs.md)
 - [Anti-cheating layer](docs/anticheat.md)
+- [Tasks, wagers and deadlines](docs/tasks.md)
 
 ## Planned stack
 
@@ -96,3 +98,24 @@ cd ../frontend && npm install && npm run dev              # app on :5173, proxie
 ```
 
 `getUserMedia` needs https or localhost; use a tunnel or a local certificate to try it on a phone.
+
+## Checkpoint 4: wagers, task types and the measurements behind them
+
+The course's `ai-suggestions/cp4` branch is imported unmodified in its own commit and supplies the task store, Stripe holds, multi-view and time-spread checks and their API ([docs/tasks.md](docs/tasks.md)). Added on top of it:
+
+- `backend/bord/regions.py`: a per-region before/after check for staged-partial attacks (align the photos, split into a 4x4 grid, measure change and clutter per cell). It runs as a diagnostic `regions` signal in the anti-cheating stage until it is calibrated (Assumption 7).
+- `--prompt regions` (`backend/bord/verifier.py`): a per-region LLM prompt. Both photos get a labelled 3x3 grid, and the model must account for every region of the BEFORE photo the task concerns before it may answer "completed".
+- `backend/bord/region_eval.py`: measures the pixel check on the honest pairs and the staged-partial attacks.
+- `backend/bord/task_eval.py`: the false-hold rate on honest multi-view and time-spread submissions (Assumption 6); `plan` prints a time-spread photo schedule.
+- `backend/bord/stripe_roundtrip.py`: a real Stripe test-mode authorize, cancel and capture round trip, with Stripe's ids, statuses, the card's capture deadline and per-call latency committed to `results/` (Assumption 5).
+- `backend/bord/photo_check.py`: a committed, checkable record that no photo in `data/` has a GPS location.
+
+```bash
+cd backend
+pytest
+python -m bord.photo_check --data ../data --out ../results
+python -m bord.region_eval --manifest ../data/manifest.csv --manifest ../data/manifest_staged.csv --out ../results
+python -m bord.evaluate --manifest ../data/manifest_staged.csv --out ../results --provider anthropic --anticheat --prompt regions
+python -m bord.task_eval run --data ../data --out ../results --provider anthropic
+STRIPE_SECRET_KEY=sk_test_... python -m bord.stripe_roundtrip --out ../results
+```
