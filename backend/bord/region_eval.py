@@ -13,7 +13,7 @@ manifests and writes ``results/regions_<time>/``:
 Assumption 7 (docs/assumptions.md) is judged on these numbers together with the
 ``--prompt regions`` LLM run. Usage (from ``backend/``)::
 
-    python -m bord.region_eval --manifest ../data/manifest.csv --manifest ../data/manifest_staged.csv --out ../results
+    python -m bord.region_eval --manifest ../data/manifest.csv --out ../results
 """
 
 from __future__ import annotations

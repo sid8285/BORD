@@ -115,8 +115,9 @@ The course's `ai-suggestions/cp4` branch is imported unmodified in its own commi
 cd backend
 pytest
 python -m bord.photo_check --data ../data --out ../results
-python -m bord.region_eval --manifest ../data/manifest.csv --manifest ../data/manifest_staged.csv --out ../results
-python -m bord.evaluate --manifest ../data/manifest_staged.csv --out ../results --provider anthropic --anticheat --prompt regions
+python -m bord.region_eval --manifest ../data/manifest.csv --out ../results
+python -m bord.evaluate --manifest ../data/manifest_staged_cp4.csv --out ../results --provider anthropic --anticheat
+python -m bord.evaluate --manifest ../data/manifest_staged_cp4.csv --out ../results --provider anthropic --anticheat --prompt regions
 python -m bord.task_eval run --data ../data --out ../results --provider anthropic
 STRIPE_SECRET_KEY=sk_test_... python -m bord.stripe_roundtrip --out ../results
 ```
