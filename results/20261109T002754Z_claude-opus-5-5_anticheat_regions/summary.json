@@ -1,0 +1,849 @@
+{
+  "run": {
+    "run_id": "20261109T002754Z_claude-opus-5-5_anticheat_regions",
+    "started_at": "2026-11-09T00:27:54.284338+00:00",
+    "manifest": "..\\data\\manifest_staged_cp4.csv",
+    "verifier": "llm_plus_anticheat",
+    "anticheat": {
+      "reuse_max_distance": 3,
+      "scene_min_score": 0.45,
+      "ai_min_score": 0.5,
+      "detector": null
+    },
+    "provider": "anthropic",
+    "model": "claude-opus-5-5",
+    "effort": "low",
+    "prompt": "regions",
+    "warmup": null,
+    "host": {
+      "platform": "Windows-11-10.0.26300-SP0",
+      "machine": "AMD64",
+      "python": "3.12.10"
+    },
+    "llm_timeout_s": 6.5,
+    "server_deadline_s": 8.0,
+    "release_min_conf": 0.0,
+    "forfeit_min_conf": 0.0
+  },
+  "n_submissions": 40,
+  "n_answered": 36,
+  "n_honest": 16,
+  "n_adversarial": 20,
+  "errors": {
+    "timeout": 4
+  },
+  "honest_accuracy": 0.9375,
+  "honest_accuracy_ci95": [
+    0.7167073163197013,
+    0.9888809426916687
+  ],
+  "false_reject_rate": 0.0625,
+  "false_accept_rate_honest": null,
+  "fooled_rate": 0.2,
+  "fooled_rate_ci95": [
+    0.0806563532712,
+    0.41602172202575993
+  ],
+  "fooled_by_category": {
+    "reused": {
+      "n": 0,
+      "fooled": 0,
+      "fooled_rate": null,
+      "ci95": null
+    },
+    "web_sourced": {
+      "n": 0,
+      "fooled": 0,
+      "fooled_rate": null,
+      "ci95": null
+    },
+    "ai_edited": {
+      "n": 0,
+      "fooled": 0,
+      "fooled_rate": null,
+      "ci95": null
+    },
+    "wrong_scene": {
+      "n": 0,
+      "fooled": 0,
+      "fooled_rate": null,
+      "ci95": null
+    },
+    "staged_partial": {
+      "n": 20,
+      "fooled": 4,
+      "fooled_rate": 0.2,
+      "ci95": [
+        0.0806563532712,
+        0.41602172202575993
+      ]
+    },
+    "resubmitted": {
+      "n": 0,
+      "fooled": 0,
+      "fooled_rate": null,
+      "ci95": null
+    },
+    "recaptured": {
+      "n": 0,
+      "fooled": 0,
+      "fooled_rate": null,
+      "ci95": null
+    }
+  },
+  "latency_s": {
+    "n": 40,
+    "p50": 5.1214198000961915,
+    "p95": 7.131054400000721,
+    "max": 7.510297800065018
+  },
+  "stage_latency_s": {
+    "anticheat_s": {
+      "n": 40,
+      "p50": 0.16838709998410195,
+      "p95": 0.2783587999874726,
+      "max": 0.3031769999070093
+    },
+    "decision_s": {
+      "n": 40,
+      "p50": 7.500057108700275e-06,
+      "p95": 1.910002902150154e-05,
+      "max": 2.2799940779805183e-05
+    },
+    "llm_s": {
+      "n": 40,
+      "p50": 4.6156532999593765,
+      "p95": 6.58076899999287,
+      "max": 6.897732499986887
+    },
+    "preprocess_s": {
+      "n": 40,
+      "p50": 0.2963410000083968,
+      "p95": 0.3634454000275582,
+      "max": 0.4159446000121534
+    }
+  },
+  "realtime": {
+    "server_deadline_s": 8.0,
+    "deadline_misses": 0,
+    "deadline_miss_rate": 0.0,
+    "retried": 0,
+    "holds": 6,
+    "hold_rate": 0.15,
+    "e2e_p95_s": 7.131054400000721,
+    "status": "Holding"
+  },
+  "decisions": {
+    "honest": {
+      "hold": 5,
+      "release": 14,
+      "forfeit": 1
+    },
+    "adversarial": {
+      "forfeit": 16,
+      "release": 3,
+      "hold": 1
+    }
+  },
+  "adversarial_released": {
+    "k": 3,
+    "n": 20,
+    "rate": 0.15,
+    "ci95": [
+      0.05236779195949584,
+      0.36042329588695743
+    ]
+  },
+  "released_by_category": {
+    "reused": {
+      "k": 0,
+      "n": 0,
+      "rate": null,
+      "ci95": null
+    },
+    "web_sourced": {
+      "k": 0,
+      "n": 0,
+      "rate": null,
+      "ci95": null
+    },
+    "ai_edited": {
+      "k": 0,
+      "n": 0,
+      "rate": null,
+      "ci95": null
+    },
+    "wrong_scene": {
+      "k": 0,
+      "n": 0,
+      "rate": null,
+      "ci95": null
+    },
+    "staged_partial": {
+      "k": 3,
+      "n": 20,
+      "rate": 0.15,
+      "ci95": [
+        0.05236779195949584,
+        0.36042329588695743
+      ]
+    },
+    "resubmitted": {
+      "k": 0,
+      "n": 0,
+      "rate": null,
+      "ci95": null
+    },
+    "recaptured": {
+      "k": 0,
+      "n": 0,
+      "rate": null,
+      "ci95": null
+    }
+  },
+  "honest_completed_released": {
+    "k": 14,
+    "n": 20,
+    "rate": 0.7,
+    "ci95": [
+      0.4810232237710206,
+      0.854524726031006
+    ]
+  },
+  "anticheat": {
+    "overall": {
+      "honest": {
+        "k": 1,
+        "n": 20,
+        "rate": 0.05,
+        "ci95": [
+          0.008881219432873136,
+          0.23613589351256675
+        ]
+      },
+      "adversarial": {
+        "k": 5,
+        "n": 20,
+        "rate": 0.25,
+        "ci95": [
+          0.11186005278940309,
+          0.4687050099580636
+        ]
+      },
+      "by_category": {
+        "reused": {
+          "k": 0,
+          "n": 0,
+          "rate": null,
+          "ci95": null
+        },
+        "web_sourced": {
+          "k": 0,
+          "n": 0,
+          "rate": null,
+          "ci95": null
+        },
+        "ai_edited": {
+          "k": 0,
+          "n": 0,
+          "rate": null,
+          "ci95": null
+        },
+        "wrong_scene": {
+          "k": 0,
+          "n": 0,
+          "rate": null,
+          "ci95": null
+        },
+        "staged_partial": {
+          "k": 5,
+          "n": 20,
+          "rate": 0.25,
+          "ci95": [
+            0.11186005278940309,
+            0.4687050099580636
+          ]
+        },
+        "resubmitted": {
+          "k": 0,
+          "n": 0,
+          "rate": null,
+          "ci95": null
+        },
+        "recaptured": {
+          "k": 0,
+          "n": 0,
+          "rate": null,
+          "ci95": null
+        }
+      }
+    },
+    "signals": {
+      "ai_image": {
+        "honest": {
+          "k": 0,
+          "n": 0,
+          "rate": null,
+          "ci95": null
+        },
+        "adversarial": {
+          "k": 0,
+          "n": 0,
+          "rate": null,
+          "ci95": null
+        },
+        "by_category": {
+          "reused": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "web_sourced": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "ai_edited": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "wrong_scene": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "staged_partial": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "resubmitted": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "recaptured": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          }
+        }
+      },
+      "challenge": {
+        "honest": {
+          "k": 0,
+          "n": 0,
+          "rate": null,
+          "ci95": null
+        },
+        "adversarial": {
+          "k": 0,
+          "n": 0,
+          "rate": null,
+          "ci95": null
+        },
+        "by_category": {
+          "reused": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "web_sourced": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "ai_edited": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "wrong_scene": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "staged_partial": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "resubmitted": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "recaptured": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          }
+        }
+      },
+      "file_metadata": {
+        "honest": {
+          "k": 0,
+          "n": 20,
+          "rate": 0.0,
+          "ci95": [
+            0.0,
+            0.16113012549493322
+          ]
+        },
+        "adversarial": {
+          "k": 0,
+          "n": 20,
+          "rate": 0.0,
+          "ci95": [
+            0.0,
+            0.16113012549493322
+          ]
+        },
+        "by_category": {
+          "reused": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "web_sourced": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "ai_edited": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "wrong_scene": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "staged_partial": {
+            "k": 0,
+            "n": 20,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.16113012549493322
+            ]
+          },
+          "resubmitted": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "recaptured": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          }
+        }
+      },
+      "regions": {
+        "honest": {
+          "k": 11,
+          "n": 20,
+          "rate": 0.55,
+          "ci95": [
+            0.3420820083075997,
+            0.7418049791429071
+          ]
+        },
+        "adversarial": {
+          "k": 13,
+          "n": 20,
+          "rate": 0.65,
+          "ci95": [
+            0.43285051021946463,
+            0.8188104521320554
+          ]
+        },
+        "by_category": {
+          "reused": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "web_sourced": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "ai_edited": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "wrong_scene": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "staged_partial": {
+            "k": 13,
+            "n": 20,
+            "rate": 0.65,
+            "ci95": [
+              0.43285051021946463,
+              0.8188104521320554
+            ]
+          },
+          "resubmitted": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "recaptured": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          }
+        }
+      },
+      "reuse": {
+        "honest": {
+          "k": 0,
+          "n": 20,
+          "rate": 0.0,
+          "ci95": [
+            0.0,
+            0.16113012549493322
+          ]
+        },
+        "adversarial": {
+          "k": 0,
+          "n": 20,
+          "rate": 0.0,
+          "ci95": [
+            0.0,
+            0.16113012549493322
+          ]
+        },
+        "by_category": {
+          "reused": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "web_sourced": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "ai_edited": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "wrong_scene": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "staged_partial": {
+            "k": 0,
+            "n": 20,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.16113012549493322
+            ]
+          },
+          "resubmitted": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "recaptured": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          }
+        }
+      },
+      "scene_consistency": {
+        "honest": {
+          "k": 1,
+          "n": 20,
+          "rate": 0.05,
+          "ci95": [
+            0.008881219432873136,
+            0.23613589351256675
+          ]
+        },
+        "adversarial": {
+          "k": 5,
+          "n": 20,
+          "rate": 0.25,
+          "ci95": [
+            0.11186005278940309,
+            0.4687050099580636
+          ]
+        },
+        "by_category": {
+          "reused": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "web_sourced": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "ai_edited": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "wrong_scene": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "staged_partial": {
+            "k": 5,
+            "n": 20,
+            "rate": 0.25,
+            "ci95": [
+              0.11186005278940309,
+              0.4687050099580636
+            ]
+          },
+          "resubmitted": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "recaptured": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          }
+        }
+      },
+      "server_timestamps": {
+        "honest": {
+          "k": 0,
+          "n": 0,
+          "rate": null,
+          "ci95": null
+        },
+        "adversarial": {
+          "k": 0,
+          "n": 0,
+          "rate": null,
+          "ci95": null
+        },
+        "by_category": {
+          "reused": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "web_sourced": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "ai_edited": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "wrong_scene": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "staged_partial": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "resubmitted": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "recaptured": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          }
+        }
+      },
+      "stamp": {
+        "honest": {
+          "k": 0,
+          "n": 0,
+          "rate": null,
+          "ci95": null
+        },
+        "adversarial": {
+          "k": 0,
+          "n": 0,
+          "rate": null,
+          "ci95": null
+        },
+        "by_category": {
+          "reused": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "web_sourced": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "ai_edited": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "wrong_scene": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "staged_partial": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "resubmitted": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          },
+          "recaptured": {
+            "k": 0,
+            "n": 0,
+            "rate": null,
+            "ci95": null
+          }
+        }
+      }
+    },
+    "stage_s": {
+      "n": 40,
+      "p50": 0.16838709998410195,
+      "p95": 0.2783587999874726,
+      "max": 0.3031769999070093
+    },
+    "over_budget": 0,
+    "n": 40
+  },
+  "cost_usd": {
+    "mean_per_call": 0.02802522222222222,
+    "total": 1.008908
+  },
+  "assumptions": {
+    "1": {
+      "status": "Weakened",
+      "honest_accuracy": {
+        "k": 15,
+        "n": 16,
+        "rate": 0.9375,
+        "ci95": [
+          0.7167073163197013,
+          0.9888809426916687
+        ],
+        "threshold": 0.9,
+        "status": "Holding",
+        "significant": false
+      },
+      "fooled_rate": {
+        "k": 4,
+        "n": 20,
+        "rate": 0.2,
+        "ci95": [
+          0.0806563532712,
+          0.41602172202575993
+        ],
+        "threshold": 0.3,
+        "status": "Weakened",
+        "significant": false
+      }
+    },
+    "2": {
+      "status": "Untested",
+      "mean_cost_usd": 0.02802522222222222,
+      "cost_status": "Broken",
+      "p95_llm_latency_s": null,
+      "p95_llm_latency_at_least_s": 6.534660000004806,
+      "llm_timeouts": 4,
+      "latency_status": "Untested",
+      "thresholds": {
+        "max_cost_usd": 0.02,
+        "max_p95_latency_s": 8.0
+      }
+    },
+    "4": {
+      "status": "Untested",
+      "significant": null,
+      "detected": {
+        "k": 0,
+        "n": 0,
+        "rate": null,
+        "ci95": null
+      },
+      "threshold": 0.7
+    }
+  }
+}

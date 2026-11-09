@@ -1,0 +1,50 @@
+{
+  "run": {
+    "started_at": "2026-11-09T00:31:43.557545+00:00",
+    "provider": "none",
+    "model": "none",
+    "host": {
+      "platform": "Windows-11-10.0.26300-SP0",
+      "machine": "AMD64",
+      "python": "3.12.10"
+    },
+    "tasks": 10
+  },
+  "assumption_6": {
+    "threshold": 0.1,
+    "min_per_type": 20,
+    "multi_view": {
+      "false_hold": {
+        "k": 1,
+        "n": 5,
+        "rate": 0.2,
+        "ci95": [
+          0.03622316096978745,
+          0.6244717358814613
+        ]
+      },
+      "status": "Weakened",
+      "significant": false,
+      "enough_tasks": false,
+      "forfeited": 0,
+      "held_by_task_check": 0
+    },
+    "time_spread": {
+      "false_hold": {
+        "k": 3,
+        "n": 5,
+        "rate": 0.6,
+        "ci95": [
+          0.23071993220883708,
+          0.8823817688407467
+        ]
+      },
+      "status": "Broken",
+      "significant": true,
+      "enough_tasks": false,
+      "forfeited": 0,
+      "held_by_task_check": 3
+    }
+  },
+  "cost_usd": 0.0
+}

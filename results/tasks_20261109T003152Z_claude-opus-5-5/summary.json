@@ -1,0 +1,50 @@
+{
+  "run": {
+    "started_at": "2026-11-09T00:31:52.751810+00:00",
+    "provider": "anthropic",
+    "model": "claude-opus-5-5",
+    "host": {
+      "platform": "Windows-11-10.0.26300-SP0",
+      "machine": "AMD64",
+      "python": "3.12.10"
+    },
+    "tasks": 10
+  },
+  "assumption_6": {
+    "threshold": 0.1,
+    "min_per_type": 20,
+    "multi_view": {
+      "false_hold": {
+        "k": 1,
+        "n": 5,
+        "rate": 0.2,
+        "ci95": [
+          0.03622316096978745,
+          0.6244717358814613
+        ]
+      },
+      "status": "Weakened",
+      "significant": false,
+      "enough_tasks": false,
+      "forfeited": 0,
+      "held_by_task_check": 0
+    },
+    "time_spread": {
+      "false_hold": {
+        "k": 4,
+        "n": 5,
+        "rate": 0.8,
+        "ci95": [
+          0.3755282641185388,
+          0.9637768390302125
+        ]
+      },
+      "status": "Broken",
+      "significant": true,
+      "enough_tasks": false,
+      "forfeited": 1,
+      "held_by_task_check": 3
+    }
+  },
+  "cost_usd": 0.348008
+}
