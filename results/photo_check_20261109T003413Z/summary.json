@@ -1,12 +1,13 @@
 {
-  "checked_at": "2026-11-08T22:42:38.092869+00:00",
-  "files": 117,
+  "checked_at": "2026-11-09T00:34:13.633888+00:00",
+  "files": 157,
   "by_folder": {
     "adversarial": 28,
     "pairs": 86,
+    "tasks": 40,
     "web": 3
   },
   "with_gps": [],
-  "camera_exif_kept": 111,
+  "camera_exif_kept": 151,
   "all_gps_free": true
 }

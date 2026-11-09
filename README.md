@@ -27,6 +27,7 @@ Checkpoint 4: tasks with a wager held through Stripe test mode, multi-view and t
 - [Collecting pairs](docs/collecting_pairs.md)
 - [Anti-cheating layer](docs/anticheat.md)
 - [Tasks, wagers and deadlines](docs/tasks.md)
+- [Checkpoint 4 results](docs/results_cp4.md)
 
 ## Planned stack
 
