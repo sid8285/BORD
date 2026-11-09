@@ -33,3 +33,7 @@ Why each honest task was held: mv05, one angle flagged by the scene check; ts04 
 ## Photos
 
 `photo_check_20261109T003413Z`: all 157 photos in `data/` (pairs, attacks, web images and the task pilots), none with a GPS location.
+
+## AI-edited attacks (Assumption 4)
+
+`anticheat_20261109T005627Z_detector`: the open-source `umm-maybe/AI-image-detector` (flag at 0.5) on 15 AI-edited attacks, the 5 from Checkpoint 2 plus 10 new edits of Checkpoint 4 before photos (p027 to p042). The 10 new ones are low-resolution crops (about 250 px) cut from one ChatGPT collage, so they are not comparable to the full-size Checkpoint 2 edits. Detected 3/15 = 20% [7%, 45%] (2 of the 10 new, 1 of the 5 old); the whole interval is below 70%, so Assumption 4 holds. The scene check flagged 4 of the 10 new edits, because the image model redrew the room rather than editing it. The detector flagged 2 of 43 honest after photos.
