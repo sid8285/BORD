@@ -32,7 +32,7 @@ Why each honest task was held: mv05, one angle flagged by the scene check; ts04 
 
 ## Photos
 
-`photo_check_20261109T003413Z`: all 157 photos in `data/` (pairs, attacks, web images and the task pilots), none with a GPS location.
+`photo_check_20261109T005847Z`: all 167 photos in `data/` (pairs, attacks including the AI edits, web images and the task pilots), none with a GPS location.
 
 ## AI-edited attacks (Assumption 4)
 

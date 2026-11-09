@@ -1,8 +1,8 @@
 {
-  "checked_at": "2026-11-09T00:34:13.633888+00:00",
-  "files": 157,
+  "checked_at": "2026-11-09T00:58:47.641184+00:00",
+  "files": 167,
   "by_folder": {
-    "adversarial": 28,
+    "adversarial": 38,
     "pairs": 86,
     "tasks": 40,
     "web": 3
